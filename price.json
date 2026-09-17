@@ -1,0 +1,15 @@
+{
+  "price": 96.0,
+  "currency": "GBP",
+  "unit": "MWh",
+  "display_period": {
+    "start": "2026-09-17T06:30:00+01:00",
+    "end": "2026-09-17T07:00:00+01:00"
+  },
+  "api_period": {
+    "start": "2026-09-17T06:00:00+01:00",
+    "end": "2026-09-17T06:30:00+01:00"
+  },
+  "collected_at": "2026-09-17T07:52:49.815822+01:00",
+  "source": "Electric Insights"
+}
