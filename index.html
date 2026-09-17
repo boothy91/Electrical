@@ -4,38 +4,100 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UK Electricity Price</title>
+
 <style>
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: system-ui, sans-serif;
-  max-width: 900px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 30px 20px;
+  padding: 20px;
   background: #f5f5f5;
   color: #222;
 }
+
 .card {
   background: white;
   border-radius: 16px;
-  padding: 24px;
+  padding: 22px;
   margin-bottom: 20px;
   box-shadow: 0 2px 10px rgba(0,0,0,.08);
 }
-.price {
-  font-size: 48px;
-  font-weight: 700;
+
+h1 {
+  margin: 0 0 15px;
+  font-size: 24px;
 }
+
+h2 {
+  margin: 0 0 15px;
+  font-size: 20px;
+}
+
+.price {
+  font-size: clamp(38px, 10vw, 56px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
 .period {
   color: #666;
-  margin-top: 5px;
+  margin-top: 8px;
 }
+
 .updated {
   color: #888;
   font-size: 14px;
-  margin-top: 15px;
+  margin-top: 12px;
 }
+
+.chart-wrap {
+  position: relative;
+  width: 100%;
+  height: 400px;
+}
+
 canvas {
   width: 100%;
-  max-height: 400px;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+.point-info {
+  display: none;
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 12px;
+  background: #f1f5f9;
+}
+
+.point-info.visible {
+  display: block;
+}
+
+.point-price {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.point-date {
+  margin-top: 5px;
+  color: #444;
+}
+
+.point-time {
+  margin-top: 3px;
+  color: #666;
+}
+
+.chart-help {
+  color: #888;
+  font-size: 13px;
+  margin-top: 10px;
 }
 </style>
 </head>
@@ -44,98 +106,326 @@ canvas {
 
 <div class="card">
   <h1>UK Electricity Price</h1>
+
   <div class="price" id="price">Loading…</div>
+
   <div class="period" id="period"></div>
+
   <div class="updated" id="updated"></div>
 </div>
 
 <div class="card">
   <h2>Last 30 Days</h2>
-  <canvas id="chart"></canvas>
+
+  <div class="chart-wrap">
+    <canvas id="chart"></canvas>
+  </div>
+
+  <div class="chart-help">
+    Tap a point to see the price, date and time.
+  </div>
+
+  <div class="point-info" id="pointInfo">
+    <div class="point-price" id="pointPrice"></div>
+    <div class="point-date" id="pointDate"></div>
+    <div class="point-time" id="pointTime"></div>
+  </div>
 </div>
 
 <script>
+let chartPoints = [];
+let chartGeometry = null;
+
 async function loadData() {
-  const [priceResponse, historyResponse] = await Promise.all([
-    fetch("price.json?t=" + Date.now()),
-    fetch("history.json?t=" + Date.now())
-  ]);
+  try {
+    const [priceResponse, historyResponse] = await Promise.all([
+      fetch("price.json?t=" + Date.now()),
+      fetch("history.json?t=" + Date.now())
+    ]);
 
-  const price = await priceResponse.json();
-  const history = await historyResponse.json();
+    if (!priceResponse.ok || !historyResponse.ok) {
+      throw new Error("Failed to load data");
+    }
 
-  document.getElementById("price").textContent =
-    "£" + Number(price.price).toFixed(2) + "/MWh";
+    const price = await priceResponse.json();
+    const history = await historyResponse.json();
 
-  const start = new Date(price.display_period.start);
-  const end = new Date(price.display_period.end);
+    document.getElementById("price").textContent =
+      "£" + Number(price.price).toFixed(2) + "/MWh";
 
-  document.getElementById("period").textContent =
-    start.toLocaleString("en-GB") +
-    " – " +
-    end.toLocaleTimeString("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+    const start = new Date(price.display_period.start);
+    const end = new Date(price.display_period.end);
 
-  document.getElementById("updated").textContent =
-    "Collected " +
-    new Date(price.collected_at).toLocaleString("en-GB");
+    document.getElementById("period").textContent =
+      formatDate(start) +
+      " " +
+      formatTime(start) +
+      " – " +
+      formatTime(end);
 
-  drawChart(history);
+    document.getElementById("updated").textContent =
+      "Collected " +
+      formatDateTime(new Date(price.collected_at));
+
+    drawChart(history);
+  } catch (error) {
+    document.getElementById("price").textContent = "Unable to load";
+    console.error(error);
+  }
+}
+
+function formatDate(date) {
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+function formatTime(date) {
+  return date.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function formatDateTime(date) {
+  return formatDate(date) + " " + formatTime(date);
 }
 
 function drawChart(history) {
   const canvas = document.getElementById("chart");
-  const ctx = canvas.getContext("2d");
+  const rect = canvas.getBoundingClientRect();
 
-  const width = canvas.clientWidth;
-  const height = 350;
+  const width = rect.width;
+  const height = rect.height;
+
   const ratio = window.devicePixelRatio || 1;
 
   canvas.width = width * ratio;
   canvas.height = height * ratio;
-  ctx.scale(ratio, ratio);
 
-  const points = history.map(item => ({
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+  if (!history.length) {
+    ctx.fillStyle = "#777";
+    ctx.font = "14px system-ui";
+    ctx.fillText("No history available yet.", 20, 30);
+    return;
+  }
+
+  chartPoints = history.map(item => ({
+    item,
     date: new Date(item.display_period.start),
     value: Number(item.price)
   }));
 
-  if (!points.length) return;
+  const values = chartPoints.map(point => point.value);
 
-  const values = points.map(p => p.value);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
+  let min = Math.min(...values);
+  let max = Math.max(...values);
 
-  const padding = 40;
-  const chartWidth = width - padding * 2;
-  const chartHeight = height - padding * 2;
+  if (min === max) {
+    min -= 1;
+    max += 1;
+  }
 
+  const paddingLeft = 55;
+  const paddingRight = 15;
+  const paddingTop = 20;
+  const paddingBottom = 35;
+
+  const chartWidth =
+    width - paddingLeft - paddingRight;
+
+  const chartHeight =
+    height - paddingTop - paddingBottom;
+
+  chartGeometry = {
+    width,
+    height,
+    paddingLeft,
+    paddingRight,
+    paddingTop,
+    paddingBottom,
+    chartWidth,
+    chartHeight,
+    min,
+    max
+  };
+
+  ctx.clearRect(0, 0, width, height);
+
+  /*
+   * Horizontal grid lines
+   */
+  ctx.strokeStyle = "#e5e7eb";
+  ctx.lineWidth = 1;
+
+  for (let i = 0; i <= 4; i++) {
+    const y =
+      paddingTop +
+      (i / 4) * chartHeight;
+
+    ctx.beginPath();
+    ctx.moveTo(paddingLeft, y);
+    ctx.lineTo(width - paddingRight, y);
+    ctx.stroke();
+
+    const value =
+      max - (i / 4) * (max - min);
+
+    ctx.fillStyle = "#777";
+    ctx.font = "11px system-ui";
+    ctx.textAlign = "right";
+
+    ctx.fillText(
+      "£" + value.toFixed(0),
+      paddingLeft - 8,
+      y + 4
+    );
+  }
+
+  /*
+   * Line
+   */
   ctx.beginPath();
 
-  points.forEach((point, i) => {
-    const x = padding +
-      (i / Math.max(points.length - 1, 1)) * chartWidth;
+  chartPoints.forEach((point, index) => {
+    const x =
+      paddingLeft +
+      (index / Math.max(chartPoints.length - 1, 1)) *
+      chartWidth;
 
-    const y = padding +
-      (1 - (point.value - min) / Math.max(max - min, 1)) *
+    const y =
+      paddingTop +
+      (1 - (point.value - min) / (max - min)) *
       chartHeight;
 
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
+    point.x = x;
+    point.y = y;
+
+    if (index === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
   });
 
   ctx.strokeStyle = "#1769aa";
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  ctx.fillStyle = "#555";
-  ctx.font = "12px system-ui";
+  /*
+   * Points
+   */
+  ctx.fillStyle = "#1769aa";
 
-  ctx.fillText("£" + max.toFixed(0), 5, padding + 5);
-  ctx.fillText("£" + min.toFixed(0), 5, height - padding);
+  chartPoints.forEach(point => {
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  /*
+   * Date labels
+   */
+  ctx.fillStyle = "#777";
+  ctx.font = "11px system-ui";
+  ctx.textAlign = "center";
+
+  const labelCount = Math.min(6, chartPoints.length);
+
+  for (let i = 0; i < labelCount; i++) {
+    const index =
+      Math.round(
+        i *
+        (chartPoints.length - 1) /
+        Math.max(labelCount - 1, 1)
+      );
+
+    const point = chartPoints[index];
+
+    ctx.fillText(
+      point.date.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short"
+      }),
+      point.x,
+      height - 10
+    );
+  }
 }
+
+function selectPoint(clientX, clientY) {
+  if (!chartGeometry || !chartPoints.length) return;
+
+  const canvas = document.getElementById("chart");
+  const rect = canvas.getBoundingClientRect();
+
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
+
+  let closest = null;
+  let closestDistance = Infinity;
+
+  chartPoints.forEach(point => {
+    const distance =
+      Math.sqrt(
+        Math.pow(point.x - x, 2) +
+        Math.pow(point.y - y, 2)
+      );
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closest = point;
+    }
+  });
+
+  /*
+   * Only select a point when the tap is reasonably
+   * close to it.
+   */
+  if (!closest || closestDistance > 25) {
+    return;
+  }
+
+  const item = closest.item;
+
+  const start =
+    new Date(item.display_period.start);
+
+  const end =
+    new Date(item.display_period.end);
+
+  document.getElementById("pointPrice").textContent =
+    "£" + Number(item.price).toFixed(2) + "/MWh";
+
+  document.getElementById("pointDate").textContent =
+    formatDate(start);
+
+  document.getElementById("pointTime").textContent =
+    formatTime(start) +
+    " – " +
+    formatTime(end);
+
+  document
+    .getElementById("pointInfo")
+    .classList.add("visible");
+}
+
+const canvas = document.getElementById("chart");
+
+canvas.addEventListener("pointerdown", event => {
+  selectPoint(event.clientX, event.clientY);
+});
+
+window.addEventListener("resize", () => {
+  if (chartPoints.length) {
+    drawChart(chartPoints.map(point => point.item));
+  }
+});
 
 loadData();
 </script>
