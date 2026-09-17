@@ -2,642 +2,502 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UK Electricity Price</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UK Electricity</title>
 <style>
-* { box-sizing: border-box; }
-
-body {
-    margin: 0;
-    font-family: system-ui, -apple-system, sans-serif;
-    background: #f5f7fa;
-    color: #17202a;
-}
-
-main {
-    max-width: 1100px;
-    margin: auto;
-    padding: 20px 14px 40px;
-}
-
-header {
-    text-align: center;
-    margin-bottom: 18px;
-}
-
-h1 {
-    margin: 0;
-    font-size: 28px;
-}
-
-.subtitle {
-    color: #68737d;
-    margin-top: 4px;
-}
-
-.current {
-    background: white;
-    border-radius: 18px;
-    padding: 22px;
-    text-align: center;
-    box-shadow: 0 2px 12px #0001;
-    margin-bottom: 16px;
-}
-
-.current-price {
-    font-size: 42px;
-    font-weight: 750;
-}
-
-.current-period {
-    color: #68737d;
-    margin-top: 5px;
-}
-
-.averages {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 18px;
-}
-
-.average {
-    background: #f5f7fa;
-    border-radius: 12px;
-    padding: 12px 8px;
-}
-
-.average-label {
-    color: #68737d;
-    font-size: 12px;
-    margin-bottom: 4px;
-}
-
-.average-value {
-    font-size: 20px;
-    font-weight: 700;
-}
-
-.card {
-    background: white;
-    border-radius: 18px;
-    padding: 16px;
-    box-shadow: 0 2px 12px #0001;
-    margin-bottom: 16px;
-}
-
-.day-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 12px;
-}
-
-.day-title {
-    font-size: 21px;
-    font-weight: 700;
-    text-align: center;
-    flex: 1;
-}
-
-button {
-    border: 0;
-    background: #edf1f5;
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 18px;
-    cursor: pointer;
-}
-
-button:disabled {
-    opacity: .35;
-}
-
-.chart-wrap {
-    position: relative;
-    width: 100%;
-    height: 430px;
-}
-
-canvas {
-    width: 100%;
-    height: 100%;
-    touch-action: none;
-}
-
-.info {
-    min-height: 74px;
-    margin-top: 12px;
-    padding: 13px;
-    background: #f5f7fa;
-    border-radius: 12px;
-    text-align: center;
-}
-
-.info-price {
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.info-time {
-    color: #68737d;
-    margin-top: 3px;
-}
-
-.overview-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.overview-wrap {
-    height: 150px;
-}
-
-#overview {
-    width: 100%;
-    height: 100%;
-    touch-action: none;
-}
-
-.hint {
-    text-align: center;
-    color: #7a858e;
-    font-size: 13px;
-    margin-top: 8px;
-}
-
-@media (max-width: 600px) {
-    main {
-        padding: 14px 10px 30px;
-    }
-
-    h1 {
-        font-size: 24px;
-    }
-
-    .current-price {
-        font-size: 36px;
-    }
-
-    .average-value {
-        font-size: 17px;
-    }
-
-    .chart-wrap {
-        height: 390px;
-    }
-
-    .day-title {
-        font-size: 18px;
-    }
-
-    button {
-        padding: 9px 12px;
-    }
+*{box-sizing:border-box}
+body{margin:0;background:#f5f5f5;color:#111;font-family:system-ui,sans-serif}
+main{max-width:1100px;margin:auto;padding:14px}
+h1{margin:0 0 14px;font-size:24px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:#fff;border-radius:15px;padding:15px;box-shadow:0 2px 8px #0001}
+.title{font-size:13px;font-weight:800;text-transform:uppercase}
+.price .title{color:#111}
+.emissions .title{color:#d00000}
+.big{font-size:25px;font-weight:800;margin-top:5px}
+.emissions .big{color:#d00000}
+.stats{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap}
+.stat span{display:block;font-size:10px;color:#777;text-transform:uppercase}
+.stat b{font-size:12px}
+.controls{display:flex;gap:7px;margin-top:14px}
+button{border:0;border-radius:9px;padding:9px 13px;font-weight:700;background:#ddd}
+button.active{background:#111;color:#fff}
+.days{display:flex;align-items:center;gap:8px;margin-top:12px}
+.days button{font-size:20px;width:45px}
+#date{text-align:center;font-weight:800;flex:1}
+.box{background:#fff;border-radius:15px;margin-top:12px;padding:12px;box-shadow:0 2px 8px #0001}
+.chart{height:370px}
+canvas{width:100%;height:100%;display:block}
+.legend{display:flex;gap:18px;font-size:12px;font-weight:700;margin:8px 0}
+.legend span{display:flex;gap:5px;align-items:center}
+.dot{width:18px;height:3px;display:inline-block}
+.black{background:#111}
+.red{background:#d00000}
+.info{background:#f1f1f1;border-radius:9px;padding:10px;font-size:13px}
+.overview{height:140px}
+@media(max-width:600px){
+main{padding:10px}
+.big{font-size:20px}
+.card{padding:12px}
+.chart{height:310px}
 }
 </style>
 </head>
-
 <body>
-
 <main>
+<h1>UK Electricity</h1>
 
-<header>
-    <h1>UK Electricity Price</h1>
-    <div class="subtitle">Electric Insights · £/MWh</div>
-</header>
+<div class="cards">
+<div class="card price">
+<div class="title">⚡ Price</div>
+<div id="price" class="big">—</div>
+<div class="stats">
+<div class="stat"><span>Day average</span><b id="priceDay">—</b></div>
+<div class="stat"><span>30 days</span><b id="price30">—</b></div>
+</div>
+</div>
 
-<section class="current">
-    <div class="current-price" id="currentPrice">Loading…</div>
-    <div class="current-period" id="currentPeriod"></div>
+<div class="card emissions">
+<div class="title">🔴 Emissions</div>
+<div id="emissions" class="big">—</div>
+<div class="stats">
+<div class="stat"><span>Day average</span><b id="emissionsDay">—</b></div>
+<div class="stat"><span>30 days</span><b id="emissions30">—</b></div>
+</div>
+</div>
+</div>
 
-    <div class="averages">
-        <div class="average">
-            <div class="average-label">Selected day average</div>
-            <div class="average-value" id="dailyAverage">—</div>
-        </div>
+<div class="controls">
+<button id="bp" class="active">PRICE</button>
+<button id="be">EMISSIONS</button>
+<button id="bb">BOTH</button>
+</div>
 
-        <div class="average">
-            <div class="average-label">30-day average</div>
-            <div class="average-value" id="monthlyAverage">—</div>
-        </div>
-    </div>
-</section>
+<div class="days">
+<button id="prev">‹</button>
+<div id="date"></div>
+<button id="next">›</button>
+</div>
 
-<section class="card">
+<div class="box">
+<div class="chart"><canvas id="chart"></canvas></div>
+<div class="legend">
+<span><i class="dot black"></i>Price</span>
+<span><i class="dot red"></i>Emissions</span>
+</div>
+<div id="info" class="info">Tap the chart to inspect a time.</div>
+</div>
 
-    <div class="day-header">
-        <button id="prevDay">‹</button>
-        <div class="day-title" id="dayTitle">Loading…</div>
-        <button id="nextDay">›</button>
-    </div>
-
-    <div class="chart-wrap">
-        <canvas id="chart"></canvas>
-    </div>
-
-    <div class="info" id="info">
-        <div>Tap a point to see the price</div>
-    </div>
-
-    <div class="hint">
-        30-minute electricity prices · tap any point
-    </div>
-
-</section>
-
-<section class="card">
-    <div class="overview-title">30-day overview</div>
-    <div class="overview-wrap">
-        <canvas id="overview"></canvas>
-    </div>
-    <div class="hint">Tap a day to open it</div>
-</section>
-
-</main>
+<div class="box">
+<strong>30-day overview</strong>
+<div class="overview"><canvas id="overview"></canvas></div>
+</div>
 
 <script>
-let history = [];
-let days = [];
-let selectedDay = 0;
+const P="history.json";
+const E="emissions_history.json";
 
-const chart = document.getElementById("chart");
-const overview = document.getElementById("overview");
+let prices=[];
+let emissions=[];
+let mode="price";
+let selectedDate=null;
+let selectedIndex=-1;
 
-const ctx = chart.getContext("2d");
-const octx = overview.getContext("2d");
+const chart=document.getElementById("chart");
+const overview=document.getElementById("overview");
 
-function money(v) {
-    return "£" + Number(v).toFixed(2) + "/MWh";
+function key(v){
+ return new Date(v).toISOString().slice(0,10);
 }
 
-function dateKey(iso) {
-    return iso.slice(0, 10);
+function time(v){
+ return new Date(v).toLocaleTimeString("en-GB",{
+  hour:"2-digit",minute:"2-digit"
+ });
 }
 
-function formatDate(key) {
-    return new Date(key + "T12:00:00").toLocaleDateString(
-        undefined,
-        { weekday: "short", day: "numeric", month: "short" }
+function money(v){
+ return "£"+(Number(v)/1000).toFixed(5)+"/kWh";
+}
+
+function carbon(v){
+ return Number(v).toFixed(0)+" gCO₂/kWh";
+}
+
+function avg(a){
+ return a.length
+  ? a.reduce((x,y)=>x+Number(y),0)/a.length
+  : 0;
+}
+
+function size(c){
+ const r=c.getBoundingClientRect();
+ const d=devicePixelRatio||1;
+ c.width=r.width*d;
+ c.height=r.height*d;
+ const x=c.getContext("2d");
+ x.setTransform(d,0,0,d,0,0);
+ return{x,w:r.width,h:r.height};
+}
+
+function dayData(){
+ const d=key(selectedDate);
+ const p=prices.filter(x=>key(x.display_period.start)===d);
+ const e=emissions.filter(x=>key(x.display_period.start)===d);
+
+ const pm=new Map(p.map(x=>[x.display_period.start,+x.price]));
+ const em=new Map(e.map(x=>[x.display_period.start,+x.emissions]));
+
+ const times=[...new Set([
+  ...p.map(x=>x.display_period.start),
+  ...e.map(x=>x.display_period.start)
+ ])].sort();
+
+ return{pm,em,times};
+}
+function line(ctx,values,color,l,t,w,h,min,max){
+ if(!values.length)return;
+
+ const range=max-min||1;
+
+ ctx.beginPath();
+
+ values.forEach((v,i)=>{
+  if(v===undefined)return;
+
+  const x=l+(i/Math.max(values.length-1,1))*w;
+  const y=t+h-((v-min)/range)*h;
+
+  if(i===0)ctx.moveTo(x,y);
+  else ctx.lineTo(x,y);
+ });
+
+ ctx.strokeStyle=color;
+ ctx.lineWidth=2.5;
+ ctx.stroke();
+}
+
+function draw(){
+ const {x,w,h}=size(chart);
+ x.clearRect(0,0,w,h);
+
+ const d=dayData();
+
+ const l=52;
+ const r=mode==="both"?58:18;
+ const t=20;
+ const b=38;
+ const pw=w-l-r;
+ const ph=h-t-b;
+
+ x.strokeStyle="#e5e5e5";
+ x.lineWidth=1;
+
+ for(let i=0;i<=4;i++){
+  const y=t+i/4*ph;
+  x.beginPath();
+  x.moveTo(l,y);
+  x.lineTo(l+pw,y);
+  x.stroke();
+ }
+
+ if(d.times.length){
+  const pv=d.times.map(v=>d.pm.get(v));
+  const ev=d.times.map(v=>d.em.get(v));
+
+  if(mode==="price"||mode==="both"){
+   const a=pv.filter(v=>v!==undefined);
+   const min=Math.min(...a);
+   const max=Math.max(...a);
+
+   line(x,pv,"#111",l,t,pw,ph,min,max);
+
+   x.fillStyle="#111";
+   x.font="10px system-ui";
+
+   for(let i=0;i<=4;i++){
+    const v=max-(max-min)*i/4;
+    x.fillText(money(v).replace("/kWh",""),3,t+i/4*ph);
+   }
+  }
+
+  if(mode==="emissions"||mode==="both"){
+   const a=ev.filter(v=>v!==undefined);
+   const min=Math.min(...a);
+   const max=Math.max(...a);
+
+   line(x,ev,"#d00000",l,t,pw,ph,min,max);
+
+   x.fillStyle="#d00000";
+   x.font="10px system-ui";
+
+   for(let i=0;i<=4;i++){
+    const v=max-(max-min)*i/4;
+    x.fillText(
+     Math.round(v),
+     w-r+7,
+     t+i/4*ph
     );
+   }
+  }
+
+  x.fillStyle="#777";
+  x.textAlign="center";
+  x.font="10px system-ui";
+
+  for(let i=0;i<d.times.length;i+=4){
+   const xx=l+
+    i/Math.max(d.times.length-1,1)*pw;
+
+   x.fillText(time(d.times[i]),xx,h-15);
+  }
+
+  x.textAlign="left";
+ }
 }
 
-function formatTime(iso) {
-    return new Date(iso).toLocaleTimeString(
-        undefined,
-        { hour: "2-digit", minute: "2-digit", hour12: false }
-    );
+function updateCards(){
+ const d=dayData();
+
+ const pv=[...d.pm.values()];
+ const ev=[...d.em.values()];
+
+ document.getElementById("price").textContent=
+  prices.length?money(prices[prices.length-1].price):"—";
+
+ document.getElementById("emissions").textContent=
+  emissions.length
+   ?carbon(emissions[emissions.length-1].emissions)
+   :"—";
+
+ document.getElementById("priceDay").textContent=
+  pv.length?money(avg(pv)):"—";
+
+ document.getElementById("emissionsDay").textContent=
+  ev.length?carbon(avg(ev)):"—";
+
+ document.getElementById("price30").textContent=
+  prices.length
+   ?money(avg(prices.map(x=>x.price)))
+   :"—";
+
+ document.getElementById("emissions30").textContent=
+  emissions.length
+   ?carbon(avg(emissions.map(x=>x.emissions)))
+   :"—";
+
+ document.getElementById("date").textContent=
+  selectedDate.toLocaleDateString("en-GB",{
+   weekday:"long",
+   day:"numeric",
+   month:"long",
+   year:"numeric"
+  });
 }
 
-function resizeCanvas(canvas, context) {
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
+function buttons(){
+ document.getElementById("bp")
+  .classList.toggle("active",mode==="price");
 
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+ document.getElementById("be")
+  .classList.toggle("active",mode==="emissions");
 
-    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+ document.getElementById("bb")
+  .classList.toggle("active",mode==="both");
+}
+function overviewDraw(){
+ const {x,w,h}=size(overview);
+ x.clearRect(0,0,w,h);
 
-    return {
-        width: rect.width,
-        height: rect.height
-    };
+ const days=[...new Set([
+  ...prices.map(v=>key(v.display_period.start)),
+  ...emissions.map(v=>key(v.display_period.start))
+ ])].sort();
+
+ if(!days.length)return;
+
+ const pv=days.map(d=>avg(
+  prices
+   .filter(v=>key(v.display_period.start)===d)
+   .map(v=>v.price)
+ ));
+
+ const ev=days.map(d=>avg(
+  emissions
+   .filter(v=>key(v.display_period.start)===d)
+   .map(v=>v.emissions)
+ ));
+
+ function ol(values,color){
+  const a=values.filter(v=>v>0);
+  if(!a.length)return;
+
+  const min=Math.min(...a);
+  const max=Math.max(...a);
+  const range=max-min||1;
+
+  x.beginPath();
+
+  values.forEach((v,i)=>{
+   if(!v)return;
+
+   const xx=i/Math.max(values.length-1,1)*w;
+   const yy=h-20-((v-min)/range)*(h-30);
+
+   if(i===0)x.moveTo(xx,yy);
+   else x.lineTo(xx,yy);
+  });
+
+  x.strokeStyle=color;
+  x.lineWidth=2;
+  x.stroke();
+ }
+
+ ol(pv,"#111");
+ ol(ev,"#d00000");
+
+ x.fillStyle="#777";
+ x.font="10px system-ui";
+ x.fillText(days[0],0,h-4);
+ x.textAlign="right";
+ x.fillText(days[days.length-1],w,h-4);
+ x.textAlign="left";
 }
 
-function drawDay() {
-    const size = resizeCanvas(chart, ctx);
-    const w = size.width;
-    const h = size.height;
-
-    ctx.clearRect(0, 0, w, h);
-
-    const data = days[selectedDay] || [];
-
-    if (!data.length) return;
-
-    const pad = {
-        left: 48,
-        right: 15,
-        top: 20,
-        bottom: 42
-    };
-
-    const plotW = w - pad.left - pad.right;
-    const plotH = h - pad.top - pad.bottom;
-
-    const values = data.map(x => Number(x.price));
-
-    let min = Math.min(...values);
-    let max = Math.max(...values);
-
-    const range = Math.max(max - min, 10);
-    min -= range * 0.12;
-    max += range * 0.12;
-
-    function x(i) {
-        return pad.left + (i / Math.max(data.length - 1, 1)) * plotW;
-    }
-
-    function y(v) {
-        return pad.top + (max - v) / (max - min) * plotH;
-    }
-
-    ctx.strokeStyle = "#dfe4e8";
-    ctx.lineWidth = 1;
-    ctx.fillStyle = "#68737d";
-    ctx.font = "12px system-ui";
-
-    for (let i = 0; i <= 4; i++) {
-        const value = min + (max - min) * i / 4;
-        const yy = y(value);
-
-        ctx.beginPath();
-        ctx.moveTo(pad.left, yy);
-        ctx.lineTo(w - pad.right, yy);
-        ctx.stroke();
-
-        ctx.textAlign = "right";
-        ctx.fillText("£" + value.toFixed(0), pad.left - 7, yy + 4);
-    }
-
-    ctx.textAlign = "center";
-
-    for (let hour = 0; hour <= 24; hour += 3) {
-        const xx = pad.left + (hour / 24) * plotW;
-
-        ctx.fillText(
-            String(hour).padStart(2, "0") + ":00",
-            xx,
-            h - 13
-        );
-
-        ctx.strokeStyle = "#eef1f3";
-        ctx.beginPath();
-        ctx.moveTo(xx, pad.top);
-        ctx.lineTo(xx, h - pad.bottom);
-        ctx.stroke();
-    }
-
-    ctx.strokeStyle = "#202830";
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-
-    data.forEach((item, i) => {
-        const xx = x(i);
-        const yy = y(Number(item.price));
-
-        if (i === 0) ctx.moveTo(xx, yy);
-        else ctx.lineTo(xx, yy);
-    });
-
-    ctx.stroke();
-
-    ctx.fillStyle = "#202830";
-
-    data.forEach((item, i) => {
-        ctx.beginPath();
-        ctx.arc(x(i), y(Number(item.price)), 3, 0, Math.PI * 2);
-        ctx.fill();
-    });
-
-    ctx._points = data.map((item, i) => ({
-        x: x(i),
-        y: y(Number(item.price)),
-        item
-    }));
+function render(){
+ buttons();
+ updateCards();
+ draw();
+ overviewDraw();
 }
 
-function drawOverview() {
-    const size = resizeCanvas(overview, octx);
-    const w = size.width;
-    const h = size.height;
+function info(){
+ const d=dayData();
 
-    octx.clearRect(0, 0, w, h);
+ if(!d.times.length)return;
 
-    if (!history.length) return;
+ if(selectedIndex<0)
+  selectedIndex=Math.floor(d.times.length/2);
 
-    const pad = 5;
+ const t=d.times[selectedIndex];
+ const p=d.pm.get(t);
+ const e=d.em.get(t);
 
-    const values = history.map(x => Number(x.price));
-    let min = Math.min(...values);
-    let max = Math.max(...values);
+ let s="<strong>"+time(t)+"</strong>";
 
-    const range = Math.max(max - min, 1);
-    min -= range * .05;
-    max += range * .05;
+ if(p!==undefined)
+  s+=" &nbsp; <b>Price: "+money(p)+"</b>";
 
-    function x(i) {
-        return pad + i / Math.max(history.length - 1, 1) * (w - pad * 2);
-    }
+ if(e!==undefined)
+  s+=' &nbsp; <b style="color:#d00000">Emissions: '+
+   carbon(e)+"</b>";
 
-    function y(v) {
-        return pad + (max - v) / (max - min) * (h - pad * 2);
-    }
-
-    octx.strokeStyle = "#202830";
-    octx.lineWidth = 1.5;
-    octx.beginPath();
-
-    history.forEach((item, i) => {
-        const xx = x(i);
-        const yy = y(Number(item.price));
-
-        if (i === 0) octx.moveTo(xx, yy);
-        else octx.lineTo(xx, yy);
-    });
-
-    octx.stroke();
-
-    octx.fillStyle = "#0001";
-
-    const selected = days[selectedDay] || [];
-
-    if (selected.length) {
-        const first = history.indexOf(selected[0]);
-        const last = history.indexOf(selected[selected.length - 1]);
-
-        if (first >= 0 && last >= 0) {
-            const xx1 = x(first);
-            const xx2 = x(last);
-
-            octx.fillRect(
-                xx1,
-                0,
-                Math.max(xx2 - xx1, 3),
-                h
-            );
-        }
-    }
-
-    octx._points = history.map((item, i) => ({
-        x: x(i),
-        y: y(Number(item.price)),
-        item
-    }));
+ document.getElementById("info").innerHTML=s;
 }
 
-function showPoint(item) {
-    const start = new Date(item.display_period.start);
-    const end = new Date(item.display_period.end);
+function changeDay(n){
+ const d=new Date(selectedDate);
+ d.setDate(d.getDate()+n);
 
-    document.getElementById("info").innerHTML = `
-        <div class="info-price">${money(item.price)}</div>
-        <div class="info-time">
-            ${start.toLocaleDateString(undefined, {
-                weekday: "short",
-                day: "numeric",
-                month: "short",
-                year: "numeric"
-            })}
-            · ${formatTime(item.display_period.start)}
-            – ${formatTime(item.display_period.end)}
-        </div>
-    `;
+ const k=key(d);
+
+ const available=new Set([
+  ...prices.map(v=>key(v.display_period.start)),
+  ...emissions.map(v=>key(v.display_period.start))
+ ]);
+
+ if(available.has(k)){
+  selectedDate=d;
+  selectedIndex=-1;
+  render();
+  info();
+ }
 }
 
-function findPoint(canvas, event) {
-    const rect = canvas.getBoundingClientRect();
-
-    const px = event.clientX - rect.left;
-    const py = event.clientY - rect.top;
-
-    const points = canvas === chart ? ctx._points : octx._points;
-
-    if (!points) return null;
-
-    let closest = null;
-    let distance = Infinity;
-
-    points.forEach(point => {
-        const d = Math.hypot(point.x - px, point.y - py);
-
-        if (d < distance) {
-            distance = d;
-            closest = point;
-        }
-    });
-
-    return distance <= 25 ? closest : null;
-}
-
-chart.addEventListener("pointerdown", event => {
-    const point = findPoint(chart, event);
-
-    if (point) showPoint(point.item);
-});
-
-overview.addEventListener("pointerdown", event => {
-    const point = findPoint(overview, event);
-
-    if (!point) return;
-
-    const key = dateKey(point.item.display_period.start);
-    const index = days.findIndex(day =>
-        day.length && dateKey(day[0].display_period.start) === key
-    );
-
-    if (index >= 0) {
-        selectedDay = index;
-        update();
-    }
-});
-
-document.getElementById("prevDay").onclick = () => {
-    if (selectedDay > 0) {
-        selectedDay--;
-        update();
-    }
+document.getElementById("bp").onclick=()=>{
+ mode="price";
+ render();
 };
 
-document.getElementById("nextDay").onclick = () => {
-    if (selectedDay < days.length - 1) {
-        selectedDay++;
-        update();
-    }
+document.getElementById("be").onclick=()=>{
+ mode="emissions";
+ render();
 };
 
-function update() {
-    const data = days[selectedDay] || [];
+document.getElementById("bb").onclick=()=>{
+ mode="both";
+ render();
+};
 
-    document.getElementById("dayTitle").textContent =
-        data.length ? formatDate(dateKey(data[0].display_period.start)) : "";
+document.getElementById("prev").onclick=()=>{
+ changeDay(-1);
+};
 
-    const dailyAverage = data.length
-        ? data.reduce((sum, item) => sum + Number(item.price), 0) / data.length
-        : 0;
+document.getElementById("next").onclick=()=>{
+ changeDay(1);
+};
 
-    const monthlyAverage = history.length
-        ? history.reduce((sum, item) => sum + Number(item.price), 0) / history.length
-        : 0;
+chart.onclick=e=>{
+ const d=dayData();
 
-    document.getElementById("dailyAverage").textContent =
-        "£" + (dailyAverage / 1000).toFixed(5) + "/kWh";
+ if(!d.times.length)return;
 
-    document.getElementById("monthlyAverage").textContent =
-        "£" + (monthlyAverage / 1000).toFixed(5) + "/kWh";
+ const rect=chart.getBoundingClientRect();
+ const l=52;
+ const r=mode==="both"?58:18;
+ const pw=rect.width-l-r;
 
-    document.getElementById("prevDay").disabled = selectedDay <= 0;
-    document.getElementById("nextDay").disabled =
-        selectedDay >= days.length - 1;
+ const ratio=Math.max(
+  0,
+  Math.min(
+   1,
+   (e.clientX-rect.left-l)/pw
+  )
+ );
 
-    drawDay();
-    drawOverview();
+ selectedIndex=Math.round(
+  ratio*(d.times.length-1)
+ );
+
+ info();
+};
+
+async function load(){
+ try{
+  const [pr,er]=await Promise.all([
+   fetch(P),
+   fetch(E)
+  ]);
+
+  prices=await pr.json();
+  emissions=await er.json();
+
+  const dates=[
+   ...prices.map(v=>new Date(v.display_period.start)),
+   ...emissions.map(v=>new Date(v.display_period.start))
+  ];
+
+  selectedDate=new Date(
+   Math.max(...dates.map(v=>v.getTime()))
+  );
+
+  selectedDate.setHours(0,0,0,0);
+
+  document.getElementById("loading")?.remove();
+
+  render();
+  info();
+
+ }catch(err){
+  document.body.innerHTML=
+   "<p style='padding:20px'>Unable to load electricity data.</p>";
+  console.error(err);
+ }
 }
 
-async function loadData() {
-    const stamp = Date.now();
-
-    const [priceResponse, historyResponse] = await Promise.all([
-        fetch("price.json?t=" + stamp),
-        fetch("history.json?t=" + stamp)
-    ]);
-
-    const price = await priceResponse.json();
-    history = await historyResponse.json();
-
-    history.sort((a, b) =>
-        a.display_period.start.localeCompare(
-            b.display_period.start
-        )
-    );
-
-    document.getElementById("currentPrice").textContent =
-        money(price.price);
-
-    document.getElementById("currentPeriod").textContent =
-        formatDate(dateKey(price.display_period.start)) +
-        " · " +
-        formatTime(price.display_period.start) +
-        " – " +
-        formatTime(price.display_period.end);
-
-    const grouped = new Map();
-
-    history.forEach(item => {
-        const key = dateKey(item.display_period.start);
-
-        if (!grouped.has(key)) grouped.set(key, []);
-
-        grouped.get(key).push(item);
-    });
-
-    days = Array.from(grouped.values());
-
-    selectedDay = days.length - 1;
-
-    update();
-}
-
-window.addEventListener("resize", update);
-
-loadData().catch(error => {
-    console.error(error);
-    document.getElementById("currentPrice").textContent =
-        "Unable to load data";
-});
+window.onresize=render;
+load();
 </script>
-
+</main>
 </body>
 </html>
