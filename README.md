@@ -2,6 +2,10 @@
 
 Automatic electricity price data from Electric Insights.
 
+## Website
+
+[View the live electricity price website](https://boothy91.github.io/Electrical/)
+
 ## What it does
 
 This project retrieves the latest UK electricity price from the Electric Insights API and stores it in JSON format.
