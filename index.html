@@ -54,6 +54,30 @@ h1 {
     margin-top: 5px;
 }
 
+.averages {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.average {
+    background: #f5f7fa;
+    border-radius: 12px;
+    padding: 12px 8px;
+}
+
+.average-label {
+    color: #68737d;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.average-value {
+    font-size: 20px;
+    font-weight: 700;
+}
+
 .card {
     background: white;
     border-radius: 18px;
@@ -157,6 +181,10 @@ canvas {
         font-size: 36px;
     }
 
+    .average-value {
+        font-size: 17px;
+    }
+
     .chart-wrap {
         height: 390px;
     }
@@ -184,6 +212,18 @@ canvas {
 <section class="current">
     <div class="current-price" id="currentPrice">Loading…</div>
     <div class="current-period" id="currentPeriod"></div>
+
+    <div class="averages">
+        <div class="average">
+            <div class="average-label">Selected day average</div>
+            <div class="average-value" id="dailyAverage">—</div>
+        </div>
+
+        <div class="average">
+            <div class="average-label">30-day average</div>
+            <div class="average-value" id="monthlyAverage">—</div>
+        </div>
+    </div>
 </section>
 
 <section class="card">
@@ -523,6 +563,20 @@ function update() {
 
     document.getElementById("dayTitle").textContent =
         data.length ? formatDate(dateKey(data[0].display_period.start)) : "";
+
+    const dailyAverage = data.length
+        ? data.reduce((sum, item) => sum + Number(item.price), 0) / data.length
+        : 0;
+
+    const monthlyAverage = history.length
+        ? history.reduce((sum, item) => sum + Number(item.price), 0) / history.length
+        : 0;
+
+    document.getElementById("dailyAverage").textContent =
+        "£" + (dailyAverage / 1000).toFixed(5) + "/kWh";
+
+    document.getElementById("monthlyAverage").textContent =
+        "£" + (monthlyAverage / 1000).toFixed(5) + "/kWh";
 
     document.getElementById("prevDay").disabled = selectedDay <= 0;
     document.getElementById("nextDay").disabled =
