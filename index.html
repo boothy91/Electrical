@@ -115,7 +115,10 @@ const chart=document.getElementById("chart");
 const overview=document.getElementById("overview");
 
 function key(v){
- return new Date(v).toISOString().slice(0,10);
+ const d=new Date(v);
+ return d.getFullYear()+"-"+
+  String(d.getMonth()+1).padStart(2,"0")+"-"+
+  String(d.getDate()).padStart(2,"0");
 }
 
 function time(v){
@@ -150,8 +153,17 @@ function size(c){
 
 function dayData(){
  const d=key(selectedDate);
- const p=prices.filter(x=>key(x.display_period.start)===d);
- const e=emissions.filter(x=>key(x.display_period.start)===d);
+ const now=new Date();
+
+ const p=prices.filter(x=>{
+  const start=new Date(x.display_period.start);
+  return key(start)===d && start<=now;
+ });
+
+ const e=emissions.filter(x=>{
+  const start=new Date(x.display_period.start);
+  return key(start)===d && start<=now;
+ });
 
  const pm=new Map(p.map(x=>[x.display_period.start,+x.price]));
  const em=new Map(e.map(x=>[x.display_period.start,+x.emissions]));
