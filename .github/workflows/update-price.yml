@@ -2,7 +2,13 @@ name: Update electricity price
 
 on:
   schedule:
+    # Every 30 minutes
     - cron: "*/30 * * * *"
+
+    # Midnight UK time (runs at 00:00 UTC during GMT,
+    # 01:00 UTC during BST)
+    - cron: "0 0 * * *"
+
   workflow_dispatch:
 
 permissions:
@@ -21,19 +27,24 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Collect electricity price
+      - name: Refresh 30-day history
+        if: github.event.schedule == '0 0 * * *'
+        run: python collect.py --refresh
+
+      - name: Collect latest price
+        if: github.event.schedule != '0 0 * * *'
         run: python collect.py
 
-      - name: Commit updated price
+      - name: Commit updated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add price.json
+          git add price.json history.json
 
           if git diff --cached --quiet; then
-            echo "Price unchanged"
+            echo "No data changes"
           else
-            git commit -m "Update electricity price"
+            git commit -m "Update electricity price data"
             git push
           fi
