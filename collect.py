@@ -6,8 +6,15 @@ import urllib.request
 from datetime import datetime, timedelta
 from pathlib import Path
 
-API_URL = (
+PRICE_API = (
     "http://electricinsights.co.uk/api/1/prices"
+    "?date_from={date_from}"
+    "&date_to={date_to}"
+    "&group_by=30m"
+)
+
+EMISSIONS_API = (
+    "http://electricinsights.co.uk/api/1/emissions"
     "?date_from={date_from}"
     "&date_to={date_to}"
     "&group_by=30m"
@@ -15,25 +22,29 @@ API_URL = (
 
 HISTORY_FILE = Path("history.json")
 PRICE_FILE = Path("price.json")
+
+EMISSIONS_HISTORY_FILE = Path("emissions_history.json")
+EMISSIONS_FILE = Path("emissions.json")
+
 MAX_DAYS = 30
 
 
-def fetch_prices(date_from, date_to):
-    url = API_URL.format(
+def fetch_api(url_template, date_from, date_to):
+    url = url_template.format(
         date_from=date_from,
         date_to=date_to,
     )
 
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": "Electrical price collector"},
+        headers={"User-Agent": "Electrical data collector"},
     )
 
     with urllib.request.urlopen(request, timeout=60) as response:
         return json.loads(response.read().decode("utf-8"))
 
 
-def make_record(item, collected_at):
+def make_price_record(item, collected_at):
     api_start = datetime.fromisoformat(item["start"])
     api_end = datetime.fromisoformat(item["end"])
 
@@ -57,21 +68,64 @@ def make_record(item, collected_at):
     }
 
 
-def load_history():
-    if not HISTORY_FILE.exists():
+def make_emissions_record(item, collected_at):
+    api_start = datetime.fromisoformat(item["start"])
+    api_end = datetime.fromisoformat(item["end"])
+
+    display_start = api_start + timedelta(minutes=30)
+    display_end = api_end + timedelta(minutes=30)
+
+    return {
+        "emissions": round(
+            float(item["value"]["totalInGperkWh"]),
+            2,
+        ),
+        "unit": "gCO2/kWh",
+        "display_period": {
+            "start": display_start.isoformat(),
+            "end": display_end.isoformat(),
+        },
+        "api_period": {
+            "start": item["start"],
+            "end": item["end"],
+        },
+        "collected_at": collected_at.isoformat(),
+        "source": "Electric Insights",
+    }
+
+
+def load_json(path):
+    if not path.exists():
         return []
 
     try:
-        return json.loads(HISTORY_FILE.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return []
 
 
-def save_history(history):
-    HISTORY_FILE.write_text(
-        json.dumps(history, indent=2) + "\n",
+def save_json(path, data):
+    path.write_text(
+        json.dumps(data, indent=2) + "\n",
         encoding="utf-8",
     )
+
+
+def trim_history(history, now):
+    cutoff = now - timedelta(days=MAX_DAYS)
+
+    history = [
+        item for item in history
+        if datetime.fromisoformat(
+            item["display_period"]["start"]
+        ) >= cutoff
+    ]
+
+    history.sort(
+        key=lambda item: item["display_period"]["start"]
+    )
+
+    return history
 
 
 def refresh_history(now):
@@ -82,103 +136,211 @@ def refresh_history(now):
         f"Refreshing 30 days: {start_date} to {end_date}"
     )
 
-    prices = fetch_prices(start_date, end_date)
+    prices = fetch_api(
+        PRICE_API,
+        start_date,
+        end_date,
+    )
+
+    emissions = fetch_api(
+        EMISSIONS_API,
+        start_date,
+        end_date,
+    )
 
     if not prices:
         raise RuntimeError("No price records returned")
 
-    history = []
+    if not emissions:
+        raise RuntimeError("No emissions records returned")
+
+    price_history = []
+    emissions_history = []
 
     for item in prices:
-        record = make_record(item, now)
+        record = make_price_record(item, now)
 
         display_start = datetime.fromisoformat(
             record["display_period"]["start"]
         )
 
         if display_start <= now:
-            history.append(record)
+            price_history.append(record)
 
-    cutoff = now - timedelta(days=MAX_DAYS)
+    for item in emissions:
+        record = make_emissions_record(item, now)
 
-    history = [
-        item for item in history
-        if datetime.fromisoformat(
-            item["display_period"]["start"]
-        ) >= cutoff
-    ]
-
-    history.sort(
-        key=lambda item: item["display_period"]["start"]
-    )
-
-    save_history(history)
-
-    if history:
-        PRICE_FILE.write_text(
-            json.dumps(history[-1], indent=2) + "\n",
-            encoding="utf-8",
+        display_start = datetime.fromisoformat(
+            record["display_period"]["start"]
         )
 
-    print(f"Loaded {len(history)} history records")
+        if display_start <= now:
+            emissions_history.append(record)
 
-    if history:
-        print(json.dumps(history[-1], indent=2))
+    price_history = trim_history(price_history, now)
+    emissions_history = trim_history(emissions_history, now)
+
+    save_json(HISTORY_FILE, price_history)
+    save_json(EMISSIONS_HISTORY_FILE, emissions_history)
+
+    if price_history:
+        save_json(PRICE_FILE, price_history[-1])
+
+    if emissions_history:
+        save_json(
+            EMISSIONS_FILE,
+            emissions_history[-1],
+        )
+
+    print(
+        f"Price history records: {len(price_history)}"
+    )
+
+    print(
+        f"Emissions history records: "
+        f"{len(emissions_history)}"
+    )
+
+    if price_history:
+        print("\nLatest price:")
+        print(json.dumps(price_history[-1], indent=2))
+
+    if emissions_history:
+        print("\nLatest emissions:")
+        print(
+            json.dumps(
+                emissions_history[-1],
+                indent=2,
+            )
+        )
 
 
 def update_latest(now):
-    prices = fetch_prices(
-        now.strftime("%Y-%m-%d"),
-        (now + timedelta(days=1)).strftime("%Y-%m-%d"),
+    date_from = now.strftime("%Y-%m-%d")
+    date_to = (now + timedelta(days=1)).strftime("%Y-%m-%d")
+
+    prices = fetch_api(
+        PRICE_API,
+        date_from,
+        date_to,
+    )
+
+    emissions = fetch_api(
+        EMISSIONS_API,
+        date_from,
+        date_to,
     )
 
     if not prices:
         raise RuntimeError("No price records returned")
 
-    latest = prices[-1]
-    output = make_record(latest, now)
+    if not emissions:
+        raise RuntimeError("No emissions records returned")
 
-    history = load_history()
+    valid_prices = [
+        item for item in prices
+        if datetime.fromisoformat(item["start"]) + timedelta(minutes=30) <= now
+    ]
 
-    display_start = output["display_period"]["start"]
+    valid_emissions = [
+        item for item in emissions
+        if datetime.fromisoformat(item["start"]) + timedelta(minutes=30) <= now
+    ]
 
-    history = [
-        item for item in history
+    if not valid_prices:
+        raise RuntimeError("No completed price period available")
+
+    if not valid_emissions:
+        raise RuntimeError("No completed emissions period available")
+
+    price_output = make_price_record(
+        valid_prices[-1],
+        now,
+    )
+
+    emissions_output = make_emissions_record(
+        valid_emissions[-1],
+        now,
+    )
+
+    price_history = load_json(HISTORY_FILE)
+    emissions_history = load_json(
+        EMISSIONS_HISTORY_FILE
+    )
+
+    price_period = price_output["display_period"]["start"]
+
+    price_history = [
+        item for item in price_history
         if item.get("display_period", {}).get("start")
-        != display_start
+        != price_period
     ]
 
-    history.append(output)
+    price_history.append(price_output)
+    price_history = trim_history(
+        price_history,
+        now,
+    )
 
-    cutoff = now - timedelta(days=MAX_DAYS)
+    emissions_period = (
+        emissions_output["display_period"]["start"]
+    )
 
-    history = [
-        item for item in history
-        if datetime.fromisoformat(
-            item["display_period"]["start"]
-        ) >= cutoff
+    emissions_history = [
+        item for item in emissions_history
+        if item.get("display_period", {}).get("start")
+        != emissions_period
     ]
 
-    history.sort(
-        key=lambda item: item["display_period"]["start"]
+    emissions_history.append(emissions_output)
+
+    emissions_history = trim_history(
+        emissions_history,
+        now,
     )
 
-    save_history(history)
-
-    PRICE_FILE.write_text(
-        json.dumps(output, indent=2) + "\n",
-        encoding="utf-8",
+    save_json(HISTORY_FILE, price_history)
+    save_json(
+        EMISSIONS_HISTORY_FILE,
+        emissions_history,
     )
 
-    print(json.dumps(output, indent=2))
-    print(f"History records: {len(history)}")
+    save_json(PRICE_FILE, price_output)
+    save_json(
+        EMISSIONS_FILE,
+        emissions_output,
+    )
+
+    print("\nLatest price:")
+    print(json.dumps(price_output, indent=2))
+
+    print("\nLatest emissions:")
+    print(json.dumps(emissions_output, indent=2))
+
+    print(
+        f"\nPrice history records: "
+        f"{len(price_history)}"
+    )
+
+    print(
+        f"Emissions history records: "
+        f"{len(emissions_history)}"
+    )
 
 
 def main():
     now = datetime.now().astimezone()
-    history = load_history()
 
-    if "--refresh" in sys.argv or not history:
+    price_history = load_json(HISTORY_FILE)
+    emissions_history = load_json(
+        EMISSIONS_HISTORY_FILE
+    )
+
+    if (
+        "--refresh" in sys.argv
+        or not price_history
+        or not emissions_history
+    ):
         refresh_history(now)
     else:
         update_latest(now)
