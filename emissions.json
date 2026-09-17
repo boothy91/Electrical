@@ -1,0 +1,14 @@
+{
+  "emissions": 42.5,
+  "unit": "gCO2/kWh",
+  "display_period": {
+    "start": "2026-09-17T09:30:00+01:00",
+    "end": "2026-09-17T10:00:00+01:00"
+  },
+  "api_period": {
+    "start": "2026-09-17T09:00:00+01:00",
+    "end": "2026-09-17T09:30:00+01:00"
+  },
+  "collected_at": "2026-09-17T10:32:13.756676+01:00",
+  "source": "Electric Insights"
+}
