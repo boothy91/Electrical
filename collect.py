@@ -3,6 +3,7 @@
 import json
 import urllib.request
 from datetime import datetime, timedelta
+from pathlib import Path
 
 API_URL = (
     "http://electricinsights.co.uk/api/1/prices"
@@ -10,6 +11,9 @@ API_URL = (
     "&date_to={date_to}"
     "&group_by=30m"
 )
+
+HISTORY_FILE = Path("history.json")
+MAX_DAYS = 30
 
 
 def get_prices():
@@ -25,9 +29,7 @@ def get_prices():
 
     request = urllib.request.Request(
         url,
-        headers={
-            "User-Agent": "Electrical price collector"
-        },
+        headers={"User-Agent": "Electrical price collector"},
     )
 
     with urllib.request.urlopen(request, timeout=30) as response:
@@ -35,6 +37,7 @@ def get_prices():
 
 
 def main():
+    now = datetime.now().astimezone()
     prices = get_prices()
 
     if not prices:
@@ -45,8 +48,6 @@ def main():
     api_start = datetime.fromisoformat(latest["start"])
     api_end = datetime.fromisoformat(latest["end"])
 
-    # Electric Insights API timestamps correspond to the
-    # following 30-minute period shown on the website.
     display_start = api_start + timedelta(minutes=30)
     display_end = api_end + timedelta(minutes=30)
 
@@ -62,15 +63,56 @@ def main():
             "start": latest["start"],
             "end": latest["end"],
         },
-        "collected_at": datetime.now().astimezone().isoformat(),
+        "collected_at": now.isoformat(),
         "source": "Electric Insights",
     }
 
-    with open("price.json", "w", encoding="utf-8") as f:
-        json.dump(output, f, indent=2)
-        f.write("\n")
+    # Latest price
+    Path("price.json").write_text(
+        json.dumps(output, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    # Load existing history
+    if HISTORY_FILE.exists():
+        try:
+            history = json.loads(HISTORY_FILE.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            history = []
+    else:
+        history = []
+
+    # Replace an existing entry for the same display period,
+    # otherwise add a new one.
+    history = [
+        item for item in history
+        if item.get("display_period", {}).get("start")
+        != output["display_period"]["start"]
+    ]
+
+    history.append(output)
+
+    # Keep only the most recent 30 days
+    cutoff = now - timedelta(days=MAX_DAYS)
+
+    history = [
+        item for item in history
+        if datetime.fromisoformat(
+            item["display_period"]["start"]
+        ) >= cutoff
+    ]
+
+    history.sort(
+        key=lambda item: item["display_period"]["start"]
+    )
+
+    HISTORY_FILE.write_text(
+        json.dumps(history, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
     print(json.dumps(output, indent=2))
+    print(f"History records: {len(history)}")
 
 
 if __name__ == "__main__":

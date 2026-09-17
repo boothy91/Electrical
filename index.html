@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UK Electricity Price</title>
+<style>
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  background: #f5f5f5;
+  color: #222;
+}
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+.price {
+  font-size: 48px;
+  font-weight: 700;
+}
+.period {
+  color: #666;
+  margin-top: 5px;
+}
+.updated {
+  color: #888;
+  font-size: 14px;
+  margin-top: 15px;
+}
+canvas {
+  width: 100%;
+  max-height: 400px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>UK Electricity Price</h1>
+  <div class="price" id="price">Loading…</div>
+  <div class="period" id="period"></div>
+  <div class="updated" id="updated"></div>
+</div>
+
+<div class="card">
+  <h2>Last 30 Days</h2>
+  <canvas id="chart"></canvas>
+</div>
+
+<script>
+async function loadData() {
+  const [priceResponse, historyResponse] = await Promise.all([
+    fetch("price.json?t=" + Date.now()),
+    fetch("history.json?t=" + Date.now())
+  ]);
+
+  const price = await priceResponse.json();
+  const history = await historyResponse.json();
+
+  document.getElementById("price").textContent =
+    "£" + Number(price.price).toFixed(2) + "/MWh";
+
+  const start = new Date(price.display_period.start);
+  const end = new Date(price.display_period.end);
+
+  document.getElementById("period").textContent =
+    start.toLocaleString("en-GB") +
+    " – " +
+    end.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+  document.getElementById("updated").textContent =
+    "Collected " +
+    new Date(price.collected_at).toLocaleString("en-GB");
+
+  drawChart(history);
+}
+
+function drawChart(history) {
+  const canvas = document.getElementById("chart");
+  const ctx = canvas.getContext("2d");
+
+  const width = canvas.clientWidth;
+  const height = 350;
+  const ratio = window.devicePixelRatio || 1;
+
+  canvas.width = width * ratio;
+  canvas.height = height * ratio;
+  ctx.scale(ratio, ratio);
+
+  const points = history.map(item => ({
+    date: new Date(item.display_period.start),
+    value: Number(item.price)
+  }));
+
+  if (!points.length) return;
+
+  const values = points.map(p => p.value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+
+  const padding = 40;
+  const chartWidth = width - padding * 2;
+  const chartHeight = height - padding * 2;
+
+  ctx.beginPath();
+
+  points.forEach((point, i) => {
+    const x = padding +
+      (i / Math.max(points.length - 1, 1)) * chartWidth;
+
+    const y = padding +
+      (1 - (point.value - min) / Math.max(max - min, 1)) *
+      chartHeight;
+
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+
+  ctx.strokeStyle = "#1769aa";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.fillStyle = "#555";
+  ctx.font = "12px system-ui";
+
+  ctx.fillText("£" + max.toFixed(0), 5, padding + 5);
+  ctx.fillText("£" + min.toFixed(0), 5, height - padding);
+}
+
+loadData();
+</script>
+
+</body>
+</html>
