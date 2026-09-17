@@ -249,6 +249,48 @@ function draw(){
    }
   }
 
+  // Highlight the selected data point
+  if(selectedIndex>=0 && selectedIndex<d.times.length){
+   const i=selectedIndex;
+   const xx=l+
+    i/Math.max(d.times.length-1,1)*pw;
+
+   const pvSelected=d.pm.get(d.times[i]);
+   const evSelected=d.em.get(d.times[i]);
+
+   if((mode==="price"||mode==="both") && pvSelected!==undefined){
+    const a=pv.filter(v=>v!==undefined);
+    const min=Math.min(...a);
+    const max=Math.max(...a);
+    const range=max-min||1;
+    const yy=t+ph-((pvSelected-min)/range)*ph;
+
+    x.beginPath();
+    x.arc(xx,yy,5,0,Math.PI*2);
+    x.fillStyle="#fff";
+    x.fill();
+    x.strokeStyle="#111";
+    x.lineWidth=2.5;
+    x.stroke();
+   }
+
+   if((mode==="emissions"||mode==="both") && evSelected!==undefined){
+    const a=ev.filter(v=>v!==undefined);
+    const min=Math.min(...a);
+    const max=Math.max(...a);
+    const range=max-min||1;
+    const yy=t+ph-((evSelected-min)/range)*ph;
+
+    x.beginPath();
+    x.arc(xx,yy,5,0,Math.PI*2);
+    x.fillStyle="#fff";
+    x.fill();
+    x.strokeStyle="#d00000";
+    x.lineWidth=2.5;
+    x.stroke();
+   }
+  }
+
   x.fillStyle="#777";
   x.textAlign="center";
   x.font="10px system-ui";
@@ -424,6 +466,11 @@ function changeDay(n){
  const d=new Date(selectedDate);
  d.setDate(d.getDate()+n);
 
+ const today=new Date();
+ today.setHours(0,0,0,0);
+
+ if(d>today)return;
+
  const k=key(d);
 
  const available=new Set([
@@ -484,6 +531,7 @@ chart.onclick=e=>{
   ratio*(d.times.length-1)
  );
 
+ draw();
  info();
 };
 
