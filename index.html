@@ -4,430 +4,585 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UK Electricity Price</title>
-
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 20px;
-  background: #f5f5f5;
-  color: #222;
+    margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #f5f7fa;
+    color: #17202a;
 }
 
-.card {
-  background: white;
-  border-radius: 16px;
-  padding: 22px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+main {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px 14px 40px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 18px;
 }
 
 h1 {
-  margin: 0 0 15px;
-  font-size: 24px;
+    margin: 0;
+    font-size: 28px;
 }
 
-h2 {
-  margin: 0 0 15px;
-  font-size: 20px;
+.subtitle {
+    color: #68737d;
+    margin-top: 4px;
 }
 
-.price {
-  font-size: clamp(38px, 10vw, 56px);
-  font-weight: 700;
-  line-height: 1.1;
+.current {
+    background: white;
+    border-radius: 18px;
+    padding: 22px;
+    text-align: center;
+    box-shadow: 0 2px 12px #0001;
+    margin-bottom: 16px;
 }
 
-.period {
-  color: #666;
-  margin-top: 8px;
+.current-price {
+    font-size: 42px;
+    font-weight: 750;
 }
 
-.updated {
-  color: #888;
-  font-size: 14px;
-  margin-top: 12px;
+.current-period {
+    color: #68737d;
+    margin-top: 5px;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 2px 12px #0001;
+    margin-bottom: 16px;
+}
+
+.day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.day-title {
+    font-size: 21px;
+    font-weight: 700;
+    text-align: center;
+    flex: 1;
+}
+
+button {
+    border: 0;
+    background: #edf1f5;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: .35;
 }
 
 .chart-wrap {
-  position: relative;
-  width: 100%;
-  height: 400px;
+    position: relative;
+    width: 100%;
+    height: 430px;
 }
 
 canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-  touch-action: none;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
 }
 
-.point-info {
-  display: none;
-  margin-top: 15px;
-  padding: 15px;
-  border-radius: 12px;
-  background: #f1f5f9;
+.info {
+    min-height: 74px;
+    margin-top: 12px;
+    padding: 13px;
+    background: #f5f7fa;
+    border-radius: 12px;
+    text-align: center;
 }
 
-.point-info.visible {
-  display: block;
+.info-price {
+    font-size: 24px;
+    font-weight: 700;
 }
 
-.point-price {
-  font-size: 26px;
-  font-weight: 700;
+.info-time {
+    color: #68737d;
+    margin-top: 3px;
 }
 
-.point-date {
-  margin-top: 5px;
-  color: #444;
+.overview-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
 
-.point-time {
-  margin-top: 3px;
-  color: #666;
+.overview-wrap {
+    height: 150px;
 }
 
-.chart-help {
-  color: #888;
-  font-size: 13px;
-  margin-top: 10px;
+#overview {
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+}
+
+.hint {
+    text-align: center;
+    color: #7a858e;
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+    main {
+        padding: 14px 10px 30px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .current-price {
+        font-size: 36px;
+    }
+
+    .chart-wrap {
+        height: 390px;
+    }
+
+    .day-title {
+        font-size: 18px;
+    }
+
+    button {
+        padding: 9px 12px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
-  <h1>UK Electricity Price</h1>
+<main>
 
-  <div class="price" id="price">Loading…</div>
+<header>
+    <h1>UK Electricity Price</h1>
+    <div class="subtitle">Electric Insights · £/MWh</div>
+</header>
 
-  <div class="period" id="period"></div>
+<section class="current">
+    <div class="current-price" id="currentPrice">Loading…</div>
+    <div class="current-period" id="currentPeriod"></div>
+</section>
 
-  <div class="updated" id="updated"></div>
-</div>
+<section class="card">
 
-<div class="card">
-  <h2>Last 30 Days</h2>
+    <div class="day-header">
+        <button id="prevDay">‹</button>
+        <div class="day-title" id="dayTitle">Loading…</div>
+        <button id="nextDay">›</button>
+    </div>
 
-  <div class="chart-wrap">
-    <canvas id="chart"></canvas>
-  </div>
+    <div class="chart-wrap">
+        <canvas id="chart"></canvas>
+    </div>
 
-  <div class="chart-help">
-    Tap a point to see the price, date and time.
-  </div>
+    <div class="info" id="info">
+        <div>Tap a point to see the price</div>
+    </div>
 
-  <div class="point-info" id="pointInfo">
-    <div class="point-price" id="pointPrice"></div>
-    <div class="point-date" id="pointDate"></div>
-    <div class="point-time" id="pointTime"></div>
-  </div>
-</div>
+    <div class="hint">
+        30-minute electricity prices · tap any point
+    </div>
+
+</section>
+
+<section class="card">
+    <div class="overview-title">30-day overview</div>
+    <div class="overview-wrap">
+        <canvas id="overview"></canvas>
+    </div>
+    <div class="hint">Tap a day to open it</div>
+</section>
+
+</main>
 
 <script>
-let chartPoints = [];
-let chartGeometry = null;
+let history = [];
+let days = [];
+let selectedDay = 0;
 
-async function loadData() {
-  try {
-    const [priceResponse, historyResponse] = await Promise.all([
-      fetch("price.json?t=" + Date.now()),
-      fetch("history.json?t=" + Date.now())
-    ]);
+const chart = document.getElementById("chart");
+const overview = document.getElementById("overview");
 
-    if (!priceResponse.ok || !historyResponse.ok) {
-      throw new Error("Failed to load data");
+const ctx = chart.getContext("2d");
+const octx = overview.getContext("2d");
+
+function money(v) {
+    return "£" + Number(v).toFixed(2) + "/MWh";
+}
+
+function dateKey(iso) {
+    return iso.slice(0, 10);
+}
+
+function formatDate(key) {
+    return new Date(key + "T12:00:00").toLocaleDateString(
+        undefined,
+        { weekday: "short", day: "numeric", month: "short" }
+    );
+}
+
+function formatTime(iso) {
+    return new Date(iso).toLocaleTimeString(
+        undefined,
+        { hour: "2-digit", minute: "2-digit", hour12: false }
+    );
+}
+
+function resizeCanvas(canvas, context) {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    return {
+        width: rect.width,
+        height: rect.height
+    };
+}
+
+function drawDay() {
+    const size = resizeCanvas(chart, ctx);
+    const w = size.width;
+    const h = size.height;
+
+    ctx.clearRect(0, 0, w, h);
+
+    const data = days[selectedDay] || [];
+
+    if (!data.length) return;
+
+    const pad = {
+        left: 48,
+        right: 15,
+        top: 20,
+        bottom: 42
+    };
+
+    const plotW = w - pad.left - pad.right;
+    const plotH = h - pad.top - pad.bottom;
+
+    const values = data.map(x => Number(x.price));
+
+    let min = Math.min(...values);
+    let max = Math.max(...values);
+
+    const range = Math.max(max - min, 10);
+    min -= range * 0.12;
+    max += range * 0.12;
+
+    function x(i) {
+        return pad.left + (i / Math.max(data.length - 1, 1)) * plotW;
     }
 
-    const price = await priceResponse.json();
-    const history = await historyResponse.json();
+    function y(v) {
+        return pad.top + (max - v) / (max - min) * plotH;
+    }
 
-    document.getElementById("price").textContent =
-      "£" + Number(price.price).toFixed(2) + "/MWh";
+    ctx.strokeStyle = "#dfe4e8";
+    ctx.lineWidth = 1;
+    ctx.fillStyle = "#68737d";
+    ctx.font = "12px system-ui";
 
-    const start = new Date(price.display_period.start);
-    const end = new Date(price.display_period.end);
+    for (let i = 0; i <= 4; i++) {
+        const value = min + (max - min) * i / 4;
+        const yy = y(value);
 
-    document.getElementById("period").textContent =
-      formatDate(start) +
-      " " +
-      formatTime(start) +
-      " – " +
-      formatTime(end);
+        ctx.beginPath();
+        ctx.moveTo(pad.left, yy);
+        ctx.lineTo(w - pad.right, yy);
+        ctx.stroke();
 
-    document.getElementById("updated").textContent =
-      "Collected " +
-      formatDateTime(new Date(price.collected_at));
+        ctx.textAlign = "right";
+        ctx.fillText("£" + value.toFixed(0), pad.left - 7, yy + 4);
+    }
 
-    drawChart(history);
-  } catch (error) {
-    document.getElementById("price").textContent = "Unable to load";
-    console.error(error);
-  }
-}
+    ctx.textAlign = "center";
 
-function formatDate(date) {
-  return date.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  });
-}
+    for (let hour = 0; hour <= 24; hour += 3) {
+        const xx = pad.left + (hour / 24) * plotW;
 
-function formatTime(date) {
-  return date.toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
+        ctx.fillText(
+            String(hour).padStart(2, "0") + ":00",
+            xx,
+            h - 13
+        );
 
-function formatDateTime(date) {
-  return formatDate(date) + " " + formatTime(date);
-}
+        ctx.strokeStyle = "#eef1f3";
+        ctx.beginPath();
+        ctx.moveTo(xx, pad.top);
+        ctx.lineTo(xx, h - pad.bottom);
+        ctx.stroke();
+    }
 
-function drawChart(history) {
-  const canvas = document.getElementById("chart");
-  const rect = canvas.getBoundingClientRect();
-
-  const width = rect.width;
-  const height = rect.height;
-
-  const ratio = window.devicePixelRatio || 1;
-
-  canvas.width = width * ratio;
-  canvas.height = height * ratio;
-
-  const ctx = canvas.getContext("2d");
-  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-
-  if (!history.length) {
-    ctx.fillStyle = "#777";
-    ctx.font = "14px system-ui";
-    ctx.fillText("No history available yet.", 20, 30);
-    return;
-  }
-
-  chartPoints = history.map(item => ({
-    item,
-    date: new Date(item.display_period.start),
-    value: Number(item.price)
-  }));
-
-  const values = chartPoints.map(point => point.value);
-
-  let min = Math.min(...values);
-  let max = Math.max(...values);
-
-  if (min === max) {
-    min -= 1;
-    max += 1;
-  }
-
-  const paddingLeft = 55;
-  const paddingRight = 15;
-  const paddingTop = 20;
-  const paddingBottom = 35;
-
-  const chartWidth =
-    width - paddingLeft - paddingRight;
-
-  const chartHeight =
-    height - paddingTop - paddingBottom;
-
-  chartGeometry = {
-    width,
-    height,
-    paddingLeft,
-    paddingRight,
-    paddingTop,
-    paddingBottom,
-    chartWidth,
-    chartHeight,
-    min,
-    max
-  };
-
-  ctx.clearRect(0, 0, width, height);
-
-  /*
-   * Horizontal grid lines
-   */
-  ctx.strokeStyle = "#e5e7eb";
-  ctx.lineWidth = 1;
-
-  for (let i = 0; i <= 4; i++) {
-    const y =
-      paddingTop +
-      (i / 4) * chartHeight;
-
+    ctx.strokeStyle = "#202830";
+    ctx.lineWidth = 2.5;
     ctx.beginPath();
-    ctx.moveTo(paddingLeft, y);
-    ctx.lineTo(width - paddingRight, y);
+
+    data.forEach((item, i) => {
+        const xx = x(i);
+        const yy = y(Number(item.price));
+
+        if (i === 0) ctx.moveTo(xx, yy);
+        else ctx.lineTo(xx, yy);
+    });
+
     ctx.stroke();
 
-    const value =
-      max - (i / 4) * (max - min);
+    ctx.fillStyle = "#202830";
 
-    ctx.fillStyle = "#777";
-    ctx.font = "11px system-ui";
-    ctx.textAlign = "right";
+    data.forEach((item, i) => {
+        ctx.beginPath();
+        ctx.arc(x(i), y(Number(item.price)), 3, 0, Math.PI * 2);
+        ctx.fill();
+    });
 
-    ctx.fillText(
-      "£" + value.toFixed(0),
-      paddingLeft - 8,
-      y + 4
-    );
-  }
-
-  /*
-   * Line
-   */
-  ctx.beginPath();
-
-  chartPoints.forEach((point, index) => {
-    const x =
-      paddingLeft +
-      (index / Math.max(chartPoints.length - 1, 1)) *
-      chartWidth;
-
-    const y =
-      paddingTop +
-      (1 - (point.value - min) / (max - min)) *
-      chartHeight;
-
-    point.x = x;
-    point.y = y;
-
-    if (index === 0) {
-      ctx.moveTo(x, y);
-    } else {
-      ctx.lineTo(x, y);
-    }
-  });
-
-  ctx.strokeStyle = "#1769aa";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  /*
-   * Points
-   */
-  ctx.fillStyle = "#1769aa";
-
-  chartPoints.forEach(point => {
-    ctx.beginPath();
-    ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-  /*
-   * Date labels
-   */
-  ctx.fillStyle = "#777";
-  ctx.font = "11px system-ui";
-  ctx.textAlign = "center";
-
-  const labelCount = Math.min(6, chartPoints.length);
-
-  for (let i = 0; i < labelCount; i++) {
-    const index =
-      Math.round(
-        i *
-        (chartPoints.length - 1) /
-        Math.max(labelCount - 1, 1)
-      );
-
-    const point = chartPoints[index];
-
-    ctx.fillText(
-      point.date.toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short"
-      }),
-      point.x,
-      height - 10
-    );
-  }
+    ctx._points = data.map((item, i) => ({
+        x: x(i),
+        y: y(Number(item.price)),
+        item
+    }));
 }
 
-function selectPoint(clientX, clientY) {
-  if (!chartGeometry || !chartPoints.length) return;
+function drawOverview() {
+    const size = resizeCanvas(overview, octx);
+    const w = size.width;
+    const h = size.height;
 
-  const canvas = document.getElementById("chart");
-  const rect = canvas.getBoundingClientRect();
+    octx.clearRect(0, 0, w, h);
 
-  const x = clientX - rect.left;
-  const y = clientY - rect.top;
+    if (!history.length) return;
 
-  let closest = null;
-  let closestDistance = Infinity;
+    const pad = 5;
 
-  chartPoints.forEach(point => {
-    const distance =
-      Math.sqrt(
-        Math.pow(point.x - x, 2) +
-        Math.pow(point.y - y, 2)
-      );
+    const values = history.map(x => Number(x.price));
+    let min = Math.min(...values);
+    let max = Math.max(...values);
 
-    if (distance < closestDistance) {
-      closestDistance = distance;
-      closest = point;
+    const range = Math.max(max - min, 1);
+    min -= range * .05;
+    max += range * .05;
+
+    function x(i) {
+        return pad + i / Math.max(history.length - 1, 1) * (w - pad * 2);
     }
-  });
 
-  /*
-   * Only select a point when the tap is reasonably
-   * close to it.
-   */
-  if (!closest || closestDistance > 25) {
-    return;
-  }
+    function y(v) {
+        return pad + (max - v) / (max - min) * (h - pad * 2);
+    }
 
-  const item = closest.item;
+    octx.strokeStyle = "#202830";
+    octx.lineWidth = 1.5;
+    octx.beginPath();
 
-  const start =
-    new Date(item.display_period.start);
+    history.forEach((item, i) => {
+        const xx = x(i);
+        const yy = y(Number(item.price));
 
-  const end =
-    new Date(item.display_period.end);
+        if (i === 0) octx.moveTo(xx, yy);
+        else octx.lineTo(xx, yy);
+    });
 
-  document.getElementById("pointPrice").textContent =
-    "£" + Number(item.price).toFixed(2) + "/MWh";
+    octx.stroke();
 
-  document.getElementById("pointDate").textContent =
-    formatDate(start);
+    octx.fillStyle = "#0001";
 
-  document.getElementById("pointTime").textContent =
-    formatTime(start) +
-    " – " +
-    formatTime(end);
+    const selected = days[selectedDay] || [];
 
-  document
-    .getElementById("pointInfo")
-    .classList.add("visible");
+    if (selected.length) {
+        const first = history.indexOf(selected[0]);
+        const last = history.indexOf(selected[selected.length - 1]);
+
+        if (first >= 0 && last >= 0) {
+            const xx1 = x(first);
+            const xx2 = x(last);
+
+            octx.fillRect(
+                xx1,
+                0,
+                Math.max(xx2 - xx1, 3),
+                h
+            );
+        }
+    }
+
+    octx._points = history.map((item, i) => ({
+        x: x(i),
+        y: y(Number(item.price)),
+        item
+    }));
 }
 
-const canvas = document.getElementById("chart");
+function showPoint(item) {
+    const start = new Date(item.display_period.start);
+    const end = new Date(item.display_period.end);
 
-canvas.addEventListener("pointerdown", event => {
-  selectPoint(event.clientX, event.clientY);
+    document.getElementById("info").innerHTML = `
+        <div class="info-price">${money(item.price)}</div>
+        <div class="info-time">
+            ${start.toLocaleDateString(undefined, {
+                weekday: "short",
+                day: "numeric",
+                month: "short",
+                year: "numeric"
+            })}
+            · ${formatTime(item.display_period.start)}
+            – ${formatTime(item.display_period.end)}
+        </div>
+    `;
+}
+
+function findPoint(canvas, event) {
+    const rect = canvas.getBoundingClientRect();
+
+    const px = event.clientX - rect.left;
+    const py = event.clientY - rect.top;
+
+    const points = canvas === chart ? ctx._points : octx._points;
+
+    if (!points) return null;
+
+    let closest = null;
+    let distance = Infinity;
+
+    points.forEach(point => {
+        const d = Math.hypot(point.x - px, point.y - py);
+
+        if (d < distance) {
+            distance = d;
+            closest = point;
+        }
+    });
+
+    return distance <= 25 ? closest : null;
+}
+
+chart.addEventListener("pointerdown", event => {
+    const point = findPoint(chart, event);
+
+    if (point) showPoint(point.item);
 });
 
-window.addEventListener("resize", () => {
-  if (chartPoints.length) {
-    drawChart(chartPoints.map(point => point.item));
-  }
+overview.addEventListener("pointerdown", event => {
+    const point = findPoint(overview, event);
+
+    if (!point) return;
+
+    const key = dateKey(point.item.display_period.start);
+    const index = days.findIndex(day =>
+        day.length && dateKey(day[0].display_period.start) === key
+    );
+
+    if (index >= 0) {
+        selectedDay = index;
+        update();
+    }
 });
 
-loadData();
+document.getElementById("prevDay").onclick = () => {
+    if (selectedDay > 0) {
+        selectedDay--;
+        update();
+    }
+};
+
+document.getElementById("nextDay").onclick = () => {
+    if (selectedDay < days.length - 1) {
+        selectedDay++;
+        update();
+    }
+};
+
+function update() {
+    const data = days[selectedDay] || [];
+
+    document.getElementById("dayTitle").textContent =
+        data.length ? formatDate(dateKey(data[0].display_period.start)) : "";
+
+    document.getElementById("prevDay").disabled = selectedDay <= 0;
+    document.getElementById("nextDay").disabled =
+        selectedDay >= days.length - 1;
+
+    drawDay();
+    drawOverview();
+}
+
+async function loadData() {
+    const stamp = Date.now();
+
+    const [priceResponse, historyResponse] = await Promise.all([
+        fetch("price.json?t=" + stamp),
+        fetch("history.json?t=" + stamp)
+    ]);
+
+    const price = await priceResponse.json();
+    history = await historyResponse.json();
+
+    history.sort((a, b) =>
+        a.display_period.start.localeCompare(
+            b.display_period.start
+        )
+    );
+
+    document.getElementById("currentPrice").textContent =
+        money(price.price);
+
+    document.getElementById("currentPeriod").textContent =
+        formatDate(dateKey(price.display_period.start)) +
+        " · " +
+        formatTime(price.display_period.start) +
+        " – " +
+        formatTime(price.display_period.end);
+
+    const grouped = new Map();
+
+    history.forEach(item => {
+        const key = dateKey(item.display_period.start);
+
+        if (!grouped.has(key)) grouped.set(key, []);
+
+        grouped.get(key).push(item);
+    });
+
+    days = Array.from(grouped.values());
+
+    selectedDay = days.length - 1;
+
+    update();
+}
+
+window.addEventListener("resize", update);
+
+loadData().catch(error => {
+    console.error(error);
+    document.getElementById("currentPrice").textContent =
+        "Unable to load data";
+});
 </script>
 
 </body>
