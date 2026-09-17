@@ -13,6 +13,13 @@ h1{margin:0 0 14px;font-size:24px}
 .card{background:#fff;border-radius:15px;padding:15px;box-shadow:0 2px 8px #0001}
 .title{font-size:13px;font-weight:800;text-transform:uppercase}
 .price .title{color:#111}
+.price-time{
+ font-size:1rem;
+ font-weight:600;
+ margin-top:-.35rem;
+ margin-bottom:.7rem;
+ color:#555;
+}
 .emissions .title{color:#d00000}
 .big{font-size:25px;font-weight:800;margin-top:5px}
 .emissions .big{color:#d00000}
@@ -51,6 +58,7 @@ main{padding:10px}
 <div class="card price">
 <div class="title">⚡ Price</div>
 <div id="price" class="big">—</div>
+<div id="priceTime" class="price-time">—</div>
 <div class="stats">
 <div class="stat"><span>Day average</span><b id="priceDay">—</b></div>
 <div class="stat"><span>30 days</span><b id="price30">—</b></div>
@@ -262,8 +270,25 @@ function updateCards(){
  const pv=[...d.pm.values()];
  const ev=[...d.em.values()];
 
+ const now=new Date();
+ const currentPrice=prices.find(x=>{
+  const start=new Date(x.display_period.start);
+  const end=new Date(x.display_period.end);
+  return now>=start && now<end;
+ }) || prices[prices.length-1];
+
  document.getElementById("price").textContent=
-  prices.length?money(prices[prices.length-1].price):"—";
+  currentPrice?money(currentPrice.price):"—";
+
+ const priceTime=document.getElementById("priceTime");
+ if(priceTime && currentPrice){
+  const start=new Date(currentPrice.display_period.start);
+  const end=new Date(currentPrice.display_period.end);
+  priceTime.textContent=
+   start.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})
+   +"–"+
+   end.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+ }
 
  document.getElementById("emissions").textContent=
   emissions.length
@@ -477,10 +502,7 @@ async function load(){
    ...emissions.map(v=>new Date(v.display_period.start))
   ];
 
-  selectedDate=new Date(
-   Math.max(...dates.map(v=>v.getTime()))
-  );
-
+  selectedDate=new Date();
   selectedDate.setHours(0,0,0,0);
 
   document.getElementById("loading")?.remove();
