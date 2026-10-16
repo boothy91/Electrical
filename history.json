@@ -1,110 +1,5 @@
 [
   {
-    "price": 209.67,
-    "currency": "GBP",
-    "unit": "MWh",
-    "display_period": {
-      "start": "2026-09-16T20:00:00+01:00",
-      "end": "2026-09-16T20:30:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-16T19:30:00+01:00",
-      "end": "2026-09-16T20:00:00+01:00"
-    },
-    "collected_at": "2026-10-16T02:48:40.251346+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "price": 207.09,
-    "currency": "GBP",
-    "unit": "MWh",
-    "display_period": {
-      "start": "2026-09-16T20:30:00+01:00",
-      "end": "2026-09-16T21:00:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-16T20:00:00+01:00",
-      "end": "2026-09-16T20:30:00+01:00"
-    },
-    "collected_at": "2026-10-16T02:48:40.251346+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "price": 124.6,
-    "currency": "GBP",
-    "unit": "MWh",
-    "display_period": {
-      "start": "2026-09-16T21:00:00+01:00",
-      "end": "2026-09-16T21:30:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-16T20:30:00+01:00",
-      "end": "2026-09-16T21:00:00+01:00"
-    },
-    "collected_at": "2026-10-16T02:48:40.251346+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "price": 122.0,
-    "currency": "GBP",
-    "unit": "MWh",
-    "display_period": {
-      "start": "2026-09-16T21:30:00+01:00",
-      "end": "2026-09-16T22:00:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-16T21:00:00+01:00",
-      "end": "2026-09-16T21:30:00+01:00"
-    },
-    "collected_at": "2026-10-16T02:48:40.251346+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "price": 123.74,
-    "currency": "GBP",
-    "unit": "MWh",
-    "display_period": {
-      "start": "2026-09-16T22:00:00+01:00",
-      "end": "2026-09-16T22:30:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-16T21:30:00+01:00",
-      "end": "2026-09-16T22:00:00+01:00"
-    },
-    "collected_at": "2026-10-16T02:48:40.251346+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "price": 113.0,
-    "currency": "GBP",
-    "unit": "MWh",
-    "display_period": {
-      "start": "2026-09-16T22:30:00+01:00",
-      "end": "2026-09-16T23:00:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-16T22:00:00+01:00",
-      "end": "2026-09-16T22:30:00+01:00"
-    },
-    "collected_at": "2026-10-16T02:48:40.251346+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "price": 111.0,
-    "currency": "GBP",
-    "unit": "MWh",
-    "display_period": {
-      "start": "2026-09-16T23:00:00+01:00",
-      "end": "2026-09-16T23:30:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-16T22:30:00+01:00",
-      "end": "2026-09-16T23:00:00+01:00"
-    },
-    "collected_at": "2026-10-16T02:48:40.251346+00:00",
-    "source": "Electric Insights"
-  },
-  {
     "price": 105.0,
     "currency": "GBP",
     "unit": "MWh",
@@ -21132,6 +21027,21 @@
       "end": "2026-10-16T18:30:00+01:00"
     },
     "collected_at": "2026-10-16T18:58:54.698251+00:00",
+    "source": "Electric Insights"
+  },
+  {
+    "price": 135.0,
+    "currency": "GBP",
+    "unit": "MWh",
+    "display_period": {
+      "start": "2026-10-16T21:30:00+01:00",
+      "end": "2026-10-16T22:00:00+01:00"
+    },
+    "api_period": {
+      "start": "2026-10-16T21:00:00+01:00",
+      "end": "2026-10-16T21:30:00+01:00"
+    },
+    "collected_at": "2026-10-16T22:01:28.623036+00:00",
     "source": "Electric Insights"
   }
 ]
