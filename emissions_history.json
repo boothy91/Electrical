@@ -1,187 +1,5 @@
 [
   {
-    "emissions": 32.19,
-    "unit": "gCO2/kWh",
-    "display_period": {
-      "start": "2026-09-19T12:30:00+01:00",
-      "end": "2026-09-19T13:00:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-19T12:00:00+01:00",
-      "end": "2026-09-19T12:30:00+01:00"
-    },
-    "collected_at": "2026-10-19T02:54:52.718811+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "emissions": 32.29,
-    "unit": "gCO2/kWh",
-    "display_period": {
-      "start": "2026-09-19T13:00:00+01:00",
-      "end": "2026-09-19T13:30:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-19T12:30:00+01:00",
-      "end": "2026-09-19T13:00:00+01:00"
-    },
-    "collected_at": "2026-10-19T02:54:52.718811+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "emissions": 33.25,
-    "unit": "gCO2/kWh",
-    "display_period": {
-      "start": "2026-09-19T13:30:00+01:00",
-      "end": "2026-09-19T14:00:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-19T13:00:00+01:00",
-      "end": "2026-09-19T13:30:00+01:00"
-    },
-    "collected_at": "2026-10-19T02:54:52.718811+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "emissions": 33.93,
-    "unit": "gCO2/kWh",
-    "display_period": {
-      "start": "2026-09-19T14:00:00+01:00",
-      "end": "2026-09-19T14:30:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-19T13:30:00+01:00",
-      "end": "2026-09-19T14:00:00+01:00"
-    },
-    "collected_at": "2026-10-19T02:54:52.718811+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "emissions": 35.2,
-    "unit": "gCO2/kWh",
-    "display_period": {
-      "start": "2026-09-19T14:30:00+01:00",
-      "end": "2026-09-19T15:00:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-19T14:00:00+01:00",
-      "end": "2026-09-19T14:30:00+01:00"
-    },
-    "collected_at": "2026-10-19T02:54:52.718811+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "emissions": 39.55,
-    "unit": "gCO2/kWh",
-    "display_period": {
-      "start": "2026-09-19T15:00:00+01:00",
-      "end": "2026-09-19T15:30:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-19T14:30:00+01:00",
-      "end": "2026-09-19T15:00:00+01:00"
-    },
-    "collected_at": "2026-10-19T02:54:52.718811+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "emissions": 40.95,
-    "unit": "gCO2/kWh",
-    "display_period": {
-      "start": "2026-09-19T15:30:00+01:00",
-      "end": "2026-09-19T16:00:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-19T15:00:00+01:00",
-      "end": "2026-09-19T15:30:00+01:00"
-    },
-    "collected_at": "2026-10-19T02:54:52.718811+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "emissions": 46.44,
-    "unit": "gCO2/kWh",
-    "display_period": {
-      "start": "2026-09-19T16:00:00+01:00",
-      "end": "2026-09-19T16:30:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-19T15:30:00+01:00",
-      "end": "2026-09-19T16:00:00+01:00"
-    },
-    "collected_at": "2026-10-19T02:54:52.718811+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "emissions": 47.96,
-    "unit": "gCO2/kWh",
-    "display_period": {
-      "start": "2026-09-19T16:30:00+01:00",
-      "end": "2026-09-19T17:00:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-19T16:00:00+01:00",
-      "end": "2026-09-19T16:30:00+01:00"
-    },
-    "collected_at": "2026-10-19T02:54:52.718811+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "emissions": 50.23,
-    "unit": "gCO2/kWh",
-    "display_period": {
-      "start": "2026-09-19T17:00:00+01:00",
-      "end": "2026-09-19T17:30:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-19T16:30:00+01:00",
-      "end": "2026-09-19T17:00:00+01:00"
-    },
-    "collected_at": "2026-10-19T02:54:52.718811+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "emissions": 50.76,
-    "unit": "gCO2/kWh",
-    "display_period": {
-      "start": "2026-09-19T17:30:00+01:00",
-      "end": "2026-09-19T18:00:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-19T17:00:00+01:00",
-      "end": "2026-09-19T17:30:00+01:00"
-    },
-    "collected_at": "2026-10-19T02:54:52.718811+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "emissions": 54.26,
-    "unit": "gCO2/kWh",
-    "display_period": {
-      "start": "2026-09-19T18:00:00+01:00",
-      "end": "2026-09-19T18:30:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-19T17:30:00+01:00",
-      "end": "2026-09-19T18:00:00+01:00"
-    },
-    "collected_at": "2026-10-19T02:54:52.718811+00:00",
-    "source": "Electric Insights"
-  },
-  {
-    "emissions": 72.67,
-    "unit": "gCO2/kWh",
-    "display_period": {
-      "start": "2026-09-19T18:30:00+01:00",
-      "end": "2026-09-19T19:00:00+01:00"
-    },
-    "api_period": {
-      "start": "2026-09-19T18:00:00+01:00",
-      "end": "2026-09-19T18:30:00+01:00"
-    },
-    "collected_at": "2026-10-19T02:54:52.718811+00:00",
-    "source": "Electric Insights"
-  },
-  {
     "emissions": 78.45,
     "unit": "gCO2/kWh",
     "display_period": {
@@ -19933,6 +19751,20 @@
       "end": "2026-10-19T11:30:00+01:00"
     },
     "collected_at": "2026-10-19T11:08:24.057286+00:00",
+    "source": "Electric Insights"
+  },
+  {
+    "emissions": 167.86,
+    "unit": "gCO2/kWh",
+    "display_period": {
+      "start": "2026-10-19T18:00:00+01:00",
+      "end": "2026-10-19T18:30:00+01:00"
+    },
+    "api_period": {
+      "start": "2026-10-19T17:30:00+01:00",
+      "end": "2026-10-19T18:00:00+01:00"
+    },
+    "collected_at": "2026-10-19T17:41:45.190402+00:00",
     "source": "Electric Insights"
   }
 ]
