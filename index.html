@@ -196,7 +196,7 @@ function genList(v){
  return out.sort((a,b)=>b.gw-a.gw);
 }
 function genPanel(){
- const v=GEN.get(slots[idx]);
+ const v=GEN.get(new Date(slots[idx]).getTime());
  $("genBox").hidden=false;
  const msg=t=>{$("genRows").innerHTML=`<div style="font-size:13px;color:#666">${t}</div>`};
  if(!GEN.size)return msg("No generation data loaded. Check that <b>generation_history.json</b> is in the same folder as this page (run <code>python collect.py --refresh</code> and upload it).");
@@ -304,7 +304,7 @@ async function load(){
   prices=await pr.json();emissions=await er.json();
   try{
    const gr=await fetch("generation_history.json");
-   if(gr.ok)(await gr.json()).forEach(v=>GEN.set(v.display_period.start,v.generation));
+   if(gr.ok)(await gr.json()).forEach(v=>GEN.set(new Date(v.display_period.start).getTime(),v.generation));
   }catch(e){console.warn("No generation data",e)}
   const now=new Date(),set=new Set();
   prices.forEach(v=>{const s=v.display_period.start;pm.set(s,+v.price);ends.set(s,v.display_period.end);if(new Date(s)<=now)set.add(s)});

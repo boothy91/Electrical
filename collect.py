@@ -64,16 +64,47 @@ def make_emissions_record(item, collected_at):
     }
 
 
+# Generation comes from Elexon's open API (no key). Times are true period
+# times. If the mix looks one step out of line with price/emissions on the
+# page, change this to 30 (or -30).
+GEN_SHIFT_MINUTES = 0
+
+ELEXON_FUELHH = (
+    "https://data.elexon.co.uk/bmrs/api/v1/datasets/FUELHH"
+    "?settlementDateFrom={d1}&settlementDateTo={d2}&format=json"
+)
+
+FUEL_NAMES = {
+    "BIOMASS": "Biomass",
+    "CCGT": "Gas",
+    "OCGT": "Gas",
+    "COAL": "Coal",
+    "NUCLEAR": "Nuclear",
+    "NPSHYD": "Hydro",
+    "WIND": "Wind",
+    "PS": "Pumped Storage",
+    "OIL": "Oil",
+    "OTHER": "Biomass",  # matches Electric Insights (07:00: 3248+217 = 3.47 GW)
+}
+
+
+def fuel_name(code):
+    if code.startswith("INT"):
+        return "Imports & Exports"
+    return FUEL_NAMES.get(code, code.title())
+
+
 def make_generation_record(item, collected_at):
-    # The whole value block is stored as returned (solar, wind, hydro, gas,
-    # coal, biomass, nuclear, pumped storage, imports, etc.), so the page can
-    # show whichever sources the API provides. Values are in MW.
+    shift = timedelta(minutes=GEN_SHIFT_MINUTES)
+    start = datetime.fromisoformat(item["start"]) + shift
+    end = datetime.fromisoformat(item["end"]) + shift
     return {
         "generation": item["value"],
         "unit": "MW",
-        **periods(item),
+        "display_period": {"start": start.isoformat(), "end": end.isoformat()},
+        "api_period": {"start": item["start"], "end": item["end"]},
         "collected_at": collected_at.isoformat(),
-        "source": "Electric Insights",
+        "source": "Elexon BMRS (FUELHH)",
     }
 
 
@@ -133,13 +164,41 @@ def last_completed(items, now):
 
 
 def fetch_generation(date_from, date_to):
-    """Generation is optional: a failure here must not stop price/emissions."""
+    """Optional: a failure here must not stop price/emissions."""
     try:
-        data = fetch_api(GENERATION_API, date_from, date_to)
-        if not data:
+        d1 = datetime.fromisoformat(date_from).date()
+        d2 = datetime.fromisoformat(date_to).date()
+        rows = {}
+        cur = d1
+        while cur <= d2:  # fetch in 7-day chunks
+            end = min(cur + timedelta(days=6), d2)
+            url = ELEXON_FUELHH.format(d1=cur.isoformat(), d2=end.isoformat())
+            req = urllib.request.Request(
+                url, headers={"User-Agent": "Electrical data collector"}
+            )
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                data = json.loads(resp.read().decode("utf-8")).get("data", [])
+            for r in data:
+                rows[(r["startTime"], r["fuelType"])] = r
+            cur = end + timedelta(days=1)
+
+        by_start = {}
+        for (start, code), r in rows.items():
+            mix = by_start.setdefault(start, {})
+            name = fuel_name(code)
+            mix[name] = mix.get(name, 0) + (r.get("generation") or 0)
+
+        items = []
+        for start in sorted(by_start):
+            s0 = datetime.fromisoformat(start.replace("Z", "+00:00"))
+            items.append({
+                "start": s0.isoformat(),
+                "end": (s0 + timedelta(minutes=30)).isoformat(),
+                "value": by_start[start],
+            })
+        if not items:
             print("Warning: no generation records returned")
-            return []
-        return data
+        return items
     except Exception as err:
         print(f"Warning: generation fetch failed: {err}")
         return []
