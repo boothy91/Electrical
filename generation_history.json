@@ -1,342 +1,6 @@
 [
   {
     "generation": {
-      "Biomass": 3734,
-      "Gas": 1424,
-      "Coal": 0,
-      "Imports & Exports": 7372,
-      "Hydro": 713,
-      "Nuclear": 4011,
-      "Oil": 0,
-      "Pumped Storage": -258,
-      "Wind": 11260
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T08:30:00+00:00",
-      "end": "2026-10-08T09:00:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T08:30:00+00:00",
-      "end": "2026-10-08T09:00:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
-      "Biomass": 3637,
-      "Gas": 1321,
-      "Coal": 0,
-      "Imports & Exports": 7318,
-      "Hydro": 714,
-      "Nuclear": 4016,
-      "Oil": 0,
-      "Pumped Storage": -462,
-      "Wind": 10385
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T09:00:00+00:00",
-      "end": "2026-10-08T09:30:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T09:00:00+00:00",
-      "end": "2026-10-08T09:30:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
-      "Biomass": 3716,
-      "Gas": 1309,
-      "Coal": 0,
-      "Imports & Exports": 7300,
-      "Hydro": 741,
-      "Nuclear": 4015,
-      "Oil": 0,
-      "Pumped Storage": -282,
-      "Wind": 10029
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T09:30:00+00:00",
-      "end": "2026-10-08T10:00:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T09:30:00+00:00",
-      "end": "2026-10-08T10:00:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
-      "Biomass": 3298,
-      "Gas": 1231,
-      "Coal": 0,
-      "Imports & Exports": 7158,
-      "Hydro": 651,
-      "Nuclear": 4019,
-      "Oil": 0,
-      "Pumped Storage": 126,
-      "Wind": 9710
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T10:00:00+00:00",
-      "end": "2026-10-08T10:30:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T10:00:00+00:00",
-      "end": "2026-10-08T10:30:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
-      "Biomass": 2282,
-      "Gas": 1262,
-      "Coal": 0,
-      "Imports & Exports": 7164,
-      "Hydro": 759,
-      "Nuclear": 4016,
-      "Oil": 0,
-      "Pumped Storage": 180,
-      "Wind": 9536
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T10:30:00+00:00",
-      "end": "2026-10-08T11:00:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T10:30:00+00:00",
-      "end": "2026-10-08T11:00:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
-      "Biomass": 2138,
-      "Gas": 1330,
-      "Coal": 0,
-      "Imports & Exports": 7354,
-      "Hydro": 742,
-      "Nuclear": 4015,
-      "Oil": 0,
-      "Pumped Storage": 134,
-      "Wind": 9544
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T11:00:00+00:00",
-      "end": "2026-10-08T11:30:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T11:00:00+00:00",
-      "end": "2026-10-08T11:30:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
-      "Biomass": 2332,
-      "Gas": 1415,
-      "Coal": 0,
-      "Imports & Exports": 7376,
-      "Hydro": 738,
-      "Nuclear": 4010,
-      "Oil": 0,
-      "Pumped Storage": 162,
-      "Wind": 8797
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T11:30:00+00:00",
-      "end": "2026-10-08T12:00:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T11:30:00+00:00",
-      "end": "2026-10-08T12:00:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
-      "Biomass": 2522,
-      "Gas": 1438,
-      "Coal": 0,
-      "Imports & Exports": 7376,
-      "Hydro": 719,
-      "Nuclear": 4009,
-      "Oil": 0,
-      "Pumped Storage": 218,
-      "Wind": 8359
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T12:00:00+00:00",
-      "end": "2026-10-08T12:30:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T12:00:00+00:00",
-      "end": "2026-10-08T12:30:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
-      "Biomass": 2352,
-      "Gas": 1443,
-      "Coal": 0,
-      "Imports & Exports": 7418,
-      "Hydro": 721,
-      "Nuclear": 4009,
-      "Oil": 0,
-      "Pumped Storage": 220,
-      "Wind": 8421
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T12:30:00+00:00",
-      "end": "2026-10-08T13:00:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T12:30:00+00:00",
-      "end": "2026-10-08T13:00:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
-      "Biomass": 2867,
-      "Gas": 1532,
-      "Coal": 0,
-      "Imports & Exports": 7088,
-      "Hydro": 727,
-      "Nuclear": 4005,
-      "Oil": 0,
-      "Pumped Storage": 222,
-      "Wind": 8724
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T13:00:00+00:00",
-      "end": "2026-10-08T13:30:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T13:00:00+00:00",
-      "end": "2026-10-08T13:30:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
-      "Biomass": 3258,
-      "Gas": 1775,
-      "Coal": 0,
-      "Imports & Exports": 7378,
-      "Hydro": 727,
-      "Nuclear": 4010,
-      "Oil": 0,
-      "Pumped Storage": 222,
-      "Wind": 8688
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T13:30:00+00:00",
-      "end": "2026-10-08T14:00:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T13:30:00+00:00",
-      "end": "2026-10-08T14:00:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
-      "Biomass": 3389,
-      "Gas": 2027,
-      "Coal": 0,
-      "Imports & Exports": 7810,
-      "Hydro": 763,
-      "Nuclear": 4009,
-      "Oil": 0,
-      "Pumped Storage": 174,
-      "Wind": 8398
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T14:00:00+00:00",
-      "end": "2026-10-08T14:30:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T14:00:00+00:00",
-      "end": "2026-10-08T14:30:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
-      "Biomass": 3386,
-      "Gas": 2883,
-      "Coal": 0,
-      "Imports & Exports": 8108,
-      "Hydro": 765,
-      "Nuclear": 4008,
-      "Oil": 0,
-      "Pumped Storage": 528,
-      "Wind": 8385
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T14:30:00+00:00",
-      "end": "2026-10-08T15:00:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T14:30:00+00:00",
-      "end": "2026-10-08T15:00:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
-      "Biomass": 3376,
-      "Gas": 3330,
-      "Coal": 0,
-      "Imports & Exports": 8906,
-      "Hydro": 802,
-      "Nuclear": 4007,
-      "Oil": 0,
-      "Pumped Storage": 860,
-      "Wind": 8993
-    },
-    "unit": "MW",
-    "display_period": {
-      "start": "2026-10-08T15:00:00+00:00",
-      "end": "2026-10-08T15:30:00+00:00"
-    },
-    "api_period": {
-      "start": "2026-10-08T15:00:00+00:00",
-      "end": "2026-10-08T15:30:00+00:00"
-    },
-    "collected_at": "2026-11-07T08:12:11.241508+00:00",
-    "source": "Elexon BMRS (FUELHH)"
-  },
-  {
-    "generation": {
       "Biomass": 3501,
       "Gas": 4603,
       "Coal": 0,
@@ -34533,6 +34197,30 @@
       "end": "2026-11-07T08:00:00+00:00"
     },
     "collected_at": "2026-11-07T08:12:11.241508+00:00",
+    "source": "Elexon BMRS (FUELHH)"
+  },
+  {
+    "generation": {
+      "Biomass": 3245,
+      "Gas": 21112,
+      "Coal": 0,
+      "Imports & Exports": 1232,
+      "Hydro": 381,
+      "Nuclear": 5124,
+      "Oil": 0,
+      "Pumped Storage": -130,
+      "Wind": 993
+    },
+    "unit": "MW",
+    "display_period": {
+      "start": "2026-11-07T14:30:00+00:00",
+      "end": "2026-11-07T15:00:00+00:00"
+    },
+    "api_period": {
+      "start": "2026-11-07T14:30:00+00:00",
+      "end": "2026-11-07T15:00:00+00:00"
+    },
+    "collected_at": "2026-11-07T15:05:40.290033+00:00",
     "source": "Elexon BMRS (FUELHH)"
   }
 ]
