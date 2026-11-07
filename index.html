@@ -37,7 +37,13 @@ canvas{width:100%;height:100%;display:block}
 .hint{font-size:12px;color:#777;margin-top:6px}
 .avg{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;margin-top:10px}
 .avg span{display:block;font-size:10px;color:#777;text-transform:uppercase}
-@media(max-width:480px){.val{font-size:21px}.ring{width:130px}.chart{height:240px}}
+.gen h2{margin:0 0 10px;font-size:15px}
+.row{display:grid;grid-template-columns:110px 1fr 120px;gap:8px;align-items:center;margin:7px 0;font-size:13px}
+.row b{font-weight:700}
+.track{background:#ece9f4;border-radius:6px;height:12px;overflow:hidden}
+.fill{height:100%;border-radius:6px}
+.row .num{text-align:right;color:#444;font-variant-numeric:tabular-nums}
+@media(max-width:480px){.row{grid-template-columns:90px 1fr 100px;font-size:12px}.val{font-size:21px}.ring{width:130px}.chart{height:240px}}
 </style>
 </head>
 <body>
@@ -73,6 +79,11 @@ canvas{width:100%;height:100%;display:block}
   <div class="level" id="eLevel">—</div>
   <div class="note" id="eNote"></div>
  </div>
+</div>
+
+<div class="box gen" id="genBox" hidden>
+ <h2>Where the power comes from</h2>
+ <div id="genRows"></div>
 </div>
 
 <div class="box">
@@ -160,6 +171,33 @@ function cards(){
  $("eDay").textContent=ev.length?carbon(avg(ev)):"—";
  $("p30").textContent=prices.length?money(avg(prices.map(x=>+x.price)))+"/kWh":"—";
  $("e30").textContent=emissions.length?carbon(avg(emissions.map(x=>+x.emissions))):"—";
+ genPanel();
+}
+
+const GEN=new Map();
+const GCOL={solar:"#ffc928",wind:"#4fc3f7",hydro:"#2a7de1",gas:"#9a9a9a",coal:"#444",biomass:"#6bbf59",nuclear:"#b44fe0",pumpedstorage:"#1fb5ad",oil:"#8d5a3b",imports:"#e8793a",other:"#bbb"};
+const prettify=k=>k.replace(/([a-z])([A-Z])/g,"$1 $2").replace(/_/g," ").replace(/^./,c=>c.toUpperCase());
+function genList(v){
+ const out=[];
+ for(const k in v){
+  if(/^total/i.test(k))continue;
+  let n=v[k];
+  if(n&&typeof n==="object")n=Object.values(n).reduce((a,b)=>a+(typeof b==="number"?b:0),0);
+  if(typeof n!=="number"||isNaN(n))continue;
+  out.push({k,name:/import|export/i.test(k)?"Imports & Exports":prettify(k),gw:n/1000});
+ }
+ const total=out.reduce((a,b)=>a+b.gw,0)||1;
+ out.forEach(o=>o.pct=o.gw/total*100);
+ return out.sort((a,b)=>b.gw-a.gw);
+}
+function genPanel(){
+ const v=GEN.get(slots[idx]);
+ $("genBox").hidden=!v;
+ if(!v)return;
+ $("genRows").innerHTML=genList(v).map(o=>{
+  const c=GCOL[o.k.toLowerCase().replace(/[^a-z]/g,"")]||(/import|export/i.test(o.k)?GCOL.imports:GCOL.other);
+  return `<div class="row"><b>${o.name}</b><div class="track"><div class="fill" style="width:${Math.min(Math.abs(o.pct),100)}%;background:${c}"></div></div><div class="num">${o.gw.toFixed(2)} GW · ${o.pct.toFixed(1)}%</div></div>`;
+ }).join("");
 }
 
 function lineOf(x,vals,col,l,t,w,h,min,max){
@@ -251,6 +289,10 @@ async function load(){
  try{
   const [pr,er]=await Promise.all([fetch("history.json"),fetch("emissions_history.json")]);
   prices=await pr.json();emissions=await er.json();
+  try{
+   const gr=await fetch("generation_history.json");
+   if(gr.ok)(await gr.json()).forEach(v=>GEN.set(v.display_period.start,v.generation));
+  }catch(e){console.warn("No generation data",e)}
   const now=new Date(),set=new Set();
   prices.forEach(v=>{const s=v.display_period.start;pm.set(s,+v.price);ends.set(s,v.display_period.end);if(new Date(s)<=now)set.add(s)});
   emissions.forEach(v=>{const s=v.display_period.start;em.set(s,+v.emissions);if(!ends.has(s))ends.set(s,v.display_period.end);if(new Date(s)<=now)set.add(s)});
