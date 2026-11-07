@@ -6,578 +6,265 @@
 <title>UK Electricity</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f5f5f5;color:#111;font-family:system-ui,sans-serif}
-main{max-width:1100px;margin:auto;padding:14px}
-h1{margin:0 0 14px;font-size:24px}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.card{background:#fff;border-radius:15px;padding:15px;box-shadow:0 2px 8px #0001}
-.title{font-size:13px;font-weight:800;text-transform:uppercase}
-.price .title{color:#111}
-.price-time{
- font-size:1rem;
- font-weight:600;
- margin-top:-.35rem;
- margin-bottom:.7rem;
- color:#555;
-}
-.emissions .title{color:#d00000}
-.big{font-size:25px;font-weight:800;margin-top:5px}
-.emissions .big{color:#d00000}
-.stats{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap}
-.stat span{display:block;font-size:10px;color:#777;text-transform:uppercase}
-.stat b{font-size:12px}
-.controls{display:flex;gap:7px;margin-top:14px}
-button{border:0;border-radius:9px;padding:9px 13px;font-weight:700;background:#ddd}
-button.active{background:#111;color:#fff}
-.days{display:flex;align-items:center;gap:8px;margin-top:12px}
-.days button{font-size:20px;width:45px}
-#date{text-align:center;font-weight:800;flex:1}
-.box{background:#fff;border-radius:15px;margin-top:12px;padding:12px;box-shadow:0 2px 8px #0001}
-.chart{height:370px}
+body{margin:0;background:#f2f1f6;color:#1b1530;font-family:system-ui,sans-serif}
+main{max-width:760px;margin:auto;padding:14px}
+h1{margin:0 0 12px;font-size:22px}
+.nav{display:flex;align-items:center;gap:10px;background:#fff;border-radius:16px;padding:10px;box-shadow:0 2px 8px #0001}
+.nav .mid{flex:1;text-align:center}
+.nav .when{font-size:22px;font-weight:800}
+.nav .day{font-size:13px;color:#666;margin-top:2px}
+.arrow{border:0;background:#1b1530;color:#fff;border-radius:50%;width:48px;height:48px;font-size:26px;line-height:1;cursor:pointer}
+.arrow:disabled{opacity:.25}
+.sub{display:flex;justify-content:space-between;margin:8px 2px}
+.sub button{border:0;background:none;color:#5b3fd0;font-weight:700;font-size:13px;padding:6px;cursor:pointer}
+.sub button:disabled{opacity:.3}
+.circles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.stat{background:#1b1530;color:#fff;border-radius:18px;padding:16px 10px;text-align:center}
+.ring{position:relative;width:150px;max-width:100%;aspect-ratio:1;margin:0 auto}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.val{font-size:26px;font-weight:800}
+.unit{font-size:12px;opacity:.7}
+.name{margin-top:10px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.level{font-size:20px;font-weight:800;margin-top:2px}
+.note{font-size:12px;opacity:.75;margin-top:4px}
+.box{background:#fff;border-radius:16px;margin-top:12px;padding:12px;box-shadow:0 2px 8px #0001}
+.tabs{display:flex;gap:6px;margin-bottom:8px}
+.tabs button{border:0;border-radius:9px;padding:8px 12px;font-weight:700;background:#e4e2ec;cursor:pointer}
+.tabs button.on{background:#1b1530;color:#fff}
+.chart{height:280px}
 canvas{width:100%;height:100%;display:block}
-.legend{display:flex;gap:18px;font-size:12px;font-weight:700;margin:8px 0}
-.legend span{display:flex;gap:5px;align-items:center}
-.dot{width:18px;height:3px;display:inline-block}
-.black{background:#111}
-.red{background:#d00000}
-.info{background:#f1f1f1;border-radius:9px;padding:10px;font-size:13px}
-.overview{height:140px}
-@media(max-width:600px){
-main{padding:10px}
-.big{font-size:20px}
-.card{padding:12px}
-.chart{height:310px}
-}
+.hint{font-size:12px;color:#777;margin-top:6px}
+.avg{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;margin-top:10px}
+.avg span{display:block;font-size:10px;color:#777;text-transform:uppercase}
+@media(max-width:480px){.val{font-size:21px}.ring{width:130px}.chart{height:240px}}
 </style>
 </head>
 <body>
 <main>
-<h1>UK Electricity</h1>
+<h1>⚡ UK Electricity</h1>
 
-<div class="cards">
-<div class="card price">
-<div class="title">⚡ Price</div>
-<div id="price" class="big">—</div>
-<div id="priceTime" class="price-time">—</div>
-<div class="stats">
-<div class="stat"><span>Day average</span><b id="priceDay">—</b></div>
-<div class="stat"><span>30 days</span><b id="price30">—</b></div>
+<div class="nav">
+ <button class="arrow" id="prev" aria-label="Earlier">‹</button>
+ <div class="mid">
+  <div class="when" id="when">—</div>
+  <div class="day" id="day"></div>
+ </div>
+ <button class="arrow" id="next" aria-label="Later">›</button>
 </div>
-</div>
-
-<div class="card emissions">
-<div class="title">🔴 Emissions</div>
-<div id="emissions" class="big">—</div>
-<div class="stats">
-<div class="stat"><span>Day average</span><b id="emissionsDay">—</b></div>
-<div class="stat"><span>30 days</span><b id="emissions30">—</b></div>
-</div>
-</div>
+<div class="sub">
+ <button id="prevDay">« Previous day</button>
+ <button id="now">Jump to now</button>
+ <button id="nextDay">Next day »</button>
 </div>
 
-<div class="controls">
-<button id="bp" class="active">PRICE</button>
-<button id="be">EMISSIONS</button>
-<button id="bb">BOTH</button>
-</div>
-
-<div class="days">
-<button id="prev">‹</button>
-<div id="date"></div>
-<button id="next">›</button>
+<div class="circles">
+ <div class="stat">
+  <div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="#ffffff22" stroke-width="9"/><circle id="pArc" cx="50" cy="50" r="42" fill="none" stroke="#53e539" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 264"/></svg>
+   <div class="in"><div class="val" id="pVal">—</div><div class="unit">per kWh</div></div></div>
+  <div class="name">Electricity price</div>
+  <div class="level" id="pLevel">—</div>
+  <div class="note" id="pNote"></div>
+ </div>
+ <div class="stat">
+  <div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="#ffffff22" stroke-width="9"/><circle id="eArc" cx="50" cy="50" r="42" fill="none" stroke="#53e539" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 264"/></svg>
+   <div class="in"><div class="val" id="eVal">—</div><div class="unit">gCO₂ per kWh</div></div></div>
+  <div class="name">Carbon emissions</div>
+  <div class="level" id="eLevel">—</div>
+  <div class="note" id="eNote"></div>
+ </div>
 </div>
 
 <div class="box">
-<div class="chart"><canvas id="chart"></canvas></div>
-<div class="legend">
-<span><i class="dot black"></i>Price</span>
-<span><i class="dot red"></i>Emissions</span>
-</div>
-<div id="info" class="info">Tap the chart to inspect a time.</div>
-</div>
-
-<div class="box">
-<strong>30-day overview</strong>
-<div class="overview"><canvas id="overview"></canvas></div>
+ <div class="tabs">
+  <button id="bp" class="on">Price</button>
+  <button id="be">Emissions</button>
+  <button id="bb">Both</button>
+ </div>
+ <div class="chart"><canvas id="chart"></canvas></div>
+ <div class="hint">Tap or drag on the chart to move to another time. Black = price, red = emissions.</div>
+ <div class="avg">
+  <div><span>Price – this day</span><b id="pDay">—</b></div>
+  <div><span>Price – 30 days</span><b id="p30">—</b></div>
+  <div><span>Emissions – this day</span><b id="eDay">—</b></div>
+  <div><span>Emissions – 30 days</span><b id="e30">—</b></div>
+ </div>
 </div>
 
 <script>
-const P="history.json";
-const E="emissions_history.json";
+const GREEN="#53e539",AMBER="#ffb020",RED="#ff4b4b";
+let prices=[],emissions=[],mode="price";
+let slots=[],pm=new Map(),em=new Map(),ends=new Map(),idx=0;
+const $=id=>document.getElementById(id);
+const cv=$("chart");
 
-let prices=[];
-let emissions=[];
-let mode="price";
-let selectedDate=null;
-let selectedIndex=-1;
+const key=v=>{const d=new Date(v);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const hm=v=>new Date(v).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+const money=v=>"£"+(Number(v)/1000).toFixed(4);
+const carbon=v=>Math.round(v)+" gCO₂/kWh";
+const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;
+const daySlots=()=>{const k=key(slots[idx]);return slots.map((s,i)=>i).filter(i=>key(slots[i])===k)};
 
-const chart=document.getElementById("chart");
-const overview=document.getElementById("overview");
-
-function key(v){
- const d=new Date(v);
- return d.getFullYear()+"-"+
-  String(d.getMonth()+1).padStart(2,"0")+"-"+
-  String(d.getDate()).padStart(2,"0");
+// Rank of a value against all 30-day values -> level, colour, plain-English note
+function rate(v,all,lowWord,midWord,highWord,cheapPhrase){
+ const lower=all.filter(x=>x<v).length/all.length;
+ const pct=Math.round(lower*100);
+ let level,col;
+ if(lower<.33){level=lowWord;col=GREEN}
+ else if(lower<.66){level=midWord;col=AMBER}
+ else{level=highWord;col=RED}
+ const note=pct<=50?`Lower than ${100-pct}% of the last 30 days`:`Higher than ${pct}% of the last 30 days`;
+ return{level,col,note,frac:Math.max(.05,lower)};
 }
 
-function time(v){
- return new Date(v).toLocaleTimeString("en-GB",{
-  hour:"2-digit",minute:"2-digit"
- });
-}
-
-function money(v){
- return "£"+(Number(v)/1000).toFixed(5)+"/kWh";
-}
-
-function carbon(v){
- return Number(v).toFixed(0)+" gCO₂/kWh";
-}
-
-function avg(a){
- return a.length
-  ? a.reduce((x,y)=>x+Number(y),0)/a.length
-  : 0;
+function arc(id,frac,col){
+ const el=$(id),c=2*Math.PI*42;
+ el.setAttribute("stroke-dasharray",(c*frac)+" "+c);
+ el.setAttribute("stroke",col);
 }
 
 function size(c){
- const r=c.getBoundingClientRect();
- const d=devicePixelRatio||1;
- c.width=r.width*d;
- c.height=r.height*d;
- const x=c.getContext("2d");
- x.setTransform(d,0,0,d,0,0);
+ const r=c.getBoundingClientRect(),d=devicePixelRatio||1;
+ c.width=r.width*d;c.height=r.height*d;
+ const x=c.getContext("2d");x.setTransform(d,0,0,d,0,0);
  return{x,w:r.width,h:r.height};
 }
 
-function dayData(){
- const d=key(selectedDate);
- const now=new Date();
+function cards(){
+ const s=slots[idx];
+ $("when").textContent=hm(s)+(ends.get(s)?" – "+hm(ends.get(s)):"");
+ const isNow=idx===slots.length-1;
+ $("day").textContent=new Date(s).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+(isNow?" · latest":"");
+ $("prev").disabled=idx===0;
+ $("next").disabled=isNow;
+ $("now").disabled=isNow;
+ const ds=daySlots();
+ $("prevDay").disabled=!slots.some(t=>key(t)<key(s));
+ $("nextDay").disabled=!slots.some(t=>key(t)>key(s));
 
- const p=prices.filter(x=>{
-  const start=new Date(x.display_period.start);
-  return key(start)===d && start<=now;
- });
+ const p=pm.get(s),e=em.get(s);
+ if(p!==undefined){
+  const r=rate(p,prices.map(x=>+x.price),"Cheap","Average","Expensive");
+  $("pVal").textContent=money(p);$("pLevel").textContent=r.level;$("pLevel").style.color=r.col;$("pNote").textContent=r.note;
+  arc("pArc",r.frac,r.col);
+ }else{$("pVal").textContent="—";$("pLevel").textContent="No data";$("pNote").textContent="";arc("pArc",0,GREEN)}
+ if(e!==undefined){
+  const r=rate(e,emissions.map(x=>+x.emissions),"Low","Medium","High");
+  $("eVal").textContent=Math.round(e);$("eLevel").textContent=r.level;$("eLevel").style.color=r.col;$("eNote").textContent=r.note;
+  arc("eArc",r.frac,r.col);
+ }else{$("eVal").textContent="—";$("eLevel").textContent="No data";$("eNote").textContent="";arc("eArc",0,GREEN)}
 
- const e=emissions.filter(x=>{
-  const start=new Date(x.display_period.start);
-  return key(start)===d && start<=now;
- });
-
- const pm=new Map(p.map(x=>[x.display_period.start,+x.price]));
- const em=new Map(e.map(x=>[x.display_period.start,+x.emissions]));
-
- const times=[...new Set([
-  ...p.map(x=>x.display_period.start),
-  ...e.map(x=>x.display_period.start)
- ])].sort();
-
- return{pm,em,times};
+ const pv=ds.map(i=>pm.get(slots[i])).filter(v=>v!==undefined);
+ const ev=ds.map(i=>em.get(slots[i])).filter(v=>v!==undefined);
+ $("pDay").textContent=pv.length?money(avg(pv))+"/kWh":"—";
+ $("eDay").textContent=ev.length?carbon(avg(ev)):"—";
+ $("p30").textContent=prices.length?money(avg(prices.map(x=>+x.price)))+"/kWh":"—";
+ $("e30").textContent=emissions.length?carbon(avg(emissions.map(x=>+x.emissions))):"—";
 }
-function line(ctx,values,color,l,t,w,h,min,max){
- if(!values.length)return;
 
- const range=max-min||1;
-
- ctx.beginPath();
-
- values.forEach((v,i)=>{
+function lineOf(x,vals,col,l,t,w,h,min,max){
+ const rg=max-min||1;x.beginPath();let started=false;
+ vals.forEach((v,i)=>{
   if(v===undefined)return;
-
-  const x=l+(i/Math.max(values.length-1,1))*w;
-  const y=t+h-((v-min)/range)*h;
-
-  if(i===0)ctx.moveTo(x,y);
-  else ctx.lineTo(x,y);
+  const px=l+i/Math.max(vals.length-1,1)*w,py=t+h-(v-min)/rg*h;
+  started?x.lineTo(px,py):x.moveTo(px,py);started=true;
  });
-
- ctx.strokeStyle=color;
- ctx.lineWidth=2.5;
- ctx.stroke();
+ x.strokeStyle=col;x.lineWidth=2.5;x.stroke();
 }
 
-function draw(){
- const {x,w,h}=size(chart);
- x.clearRect(0,0,w,h);
-
- const d=dayData();
-
- const l=52;
- const r=mode==="both"?58:18;
- const t=20;
- const b=38;
- const pw=w-l-r;
- const ph=h-t-b;
-
- x.strokeStyle="#e5e5e5";
- x.lineWidth=1;
-
- for(let i=0;i<=4;i++){
-  const y=t+i/4*ph;
-  x.beginPath();
-  x.moveTo(l,y);
-  x.lineTo(l+pw,y);
-  x.stroke();
- }
-
- if(d.times.length){
-  const pv=d.times.map(v=>d.pm.get(v));
-  const ev=d.times.map(v=>d.em.get(v));
-
-  if(mode==="price"||mode==="both"){
-   const a=pv.filter(v=>v!==undefined);
-   const min=Math.min(...a);
-   const max=Math.max(...a);
-
-   line(x,pv,"#111",l,t,pw,ph,min,max);
-
-   x.fillStyle="#111";
-   x.font="10px system-ui";
-
-   for(let i=0;i<=4;i++){
-    const v=max-(max-min)*i/4;
-    x.fillText(money(v).replace("/kWh",""),3,t+i/4*ph);
-   }
-  }
-
-  if(mode==="emissions"||mode==="both"){
-   const a=ev.filter(v=>v!==undefined);
-   const min=Math.min(...a);
-   const max=Math.max(...a);
-
-   line(x,ev,"#d00000",l,t,pw,ph,min,max);
-
-   x.fillStyle="#d00000";
-   x.font="10px system-ui";
-
-   for(let i=0;i<=4;i++){
-    const v=max-(max-min)*i/4;
-    x.fillText(
-     Math.round(v),
-     w-r+7,
-     t+i/4*ph
-    );
-   }
-  }
-
-  // Highlight the selected data point
-  if(selectedIndex>=0 && selectedIndex<d.times.length){
-   const i=selectedIndex;
-   const xx=l+
-    i/Math.max(d.times.length-1,1)*pw;
-
-   const pvSelected=d.pm.get(d.times[i]);
-   const evSelected=d.em.get(d.times[i]);
-
-   if((mode==="price"||mode==="both") && pvSelected!==undefined){
-    const a=pv.filter(v=>v!==undefined);
-    const min=Math.min(...a);
-    const max=Math.max(...a);
-    const range=max-min||1;
-    const yy=t+ph-((pvSelected-min)/range)*ph;
-
-    x.beginPath();
-    x.arc(xx,yy,5,0,Math.PI*2);
-    x.fillStyle="#fff";
-    x.fill();
-    x.strokeStyle="#111";
-    x.lineWidth=2.5;
-    x.stroke();
-   }
-
-   if((mode==="emissions"||mode==="both") && evSelected!==undefined){
-    const a=ev.filter(v=>v!==undefined);
-    const min=Math.min(...a);
-    const max=Math.max(...a);
-    const range=max-min||1;
-    const yy=t+ph-((evSelected-min)/range)*ph;
-
-    x.beginPath();
-    x.arc(xx,yy,5,0,Math.PI*2);
-    x.fillStyle="#fff";
-    x.fill();
-    x.strokeStyle="#d00000";
-    x.lineWidth=2.5;
-    x.stroke();
-   }
-  }
-
-  x.fillStyle="#777";
-  x.textAlign="center";
-  x.font="10px system-ui";
-
-  for(let i=0;i<d.times.length;i+=4){
-   const xx=l+
-    i/Math.max(d.times.length-1,1)*pw;
-
-   x.fillText(time(d.times[i]),xx,h-15);
-  }
-
-  x.textAlign="left";
- }
-}
-
-function updateCards(){
- const d=dayData();
-
- const pv=[...d.pm.values()];
- const ev=[...d.em.values()];
-
- const now=new Date();
- const currentPrice=prices.find(x=>{
-  const start=new Date(x.display_period.start);
-  const end=new Date(x.display_period.end);
-  return now>=start && now<end;
- }) || prices[prices.length-1];
-
- document.getElementById("price").textContent=
-  currentPrice?money(currentPrice.price):"—";
-
- const priceTime=document.getElementById("priceTime");
- if(priceTime && currentPrice){
-  const start=new Date(currentPrice.display_period.start);
-  const end=new Date(currentPrice.display_period.end);
-  priceTime.textContent=
-   start.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})
-   +"–"+
-   end.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
- }
-
- document.getElementById("emissions").textContent=
-  emissions.length
-   ?carbon(emissions[emissions.length-1].emissions)
-   :"—";
-
- document.getElementById("priceDay").textContent=
-  pv.length?money(avg(pv)):"—";
-
- document.getElementById("emissionsDay").textContent=
-  ev.length?carbon(avg(ev)):"—";
-
- document.getElementById("price30").textContent=
-  prices.length
-   ?money(avg(prices.map(x=>x.price)))
-   :"—";
-
- document.getElementById("emissions30").textContent=
-  emissions.length
-   ?carbon(avg(emissions.map(x=>x.emissions)))
-   :"—";
-
- document.getElementById("date").textContent=
-  selectedDate.toLocaleDateString("en-GB",{
-   weekday:"long",
-   day:"numeric",
-   month:"long",
-   year:"numeric"
-  });
-}
-
-function buttons(){
- document.getElementById("bp")
-  .classList.toggle("active",mode==="price");
-
- document.getElementById("be")
-  .classList.toggle("active",mode==="emissions");
-
- document.getElementById("bb")
-  .classList.toggle("active",mode==="both");
-}
-function overviewDraw(){
- const {x,w,h}=size(overview);
- x.clearRect(0,0,w,h);
-
- const days=[...new Set([
-  ...prices.map(v=>key(v.display_period.start)),
-  ...emissions.map(v=>key(v.display_period.start))
- ])].sort();
-
- if(!days.length)return;
-
- const pv=days.map(d=>avg(
-  prices
-   .filter(v=>key(v.display_period.start)===d)
-   .map(v=>v.price)
- ));
-
- const ev=days.map(d=>avg(
-  emissions
-   .filter(v=>key(v.display_period.start)===d)
-   .map(v=>v.emissions)
- ));
-
- function ol(values,color){
-  const a=values.filter(v=>v>0);
-  if(!a.length)return;
-
-  const min=Math.min(...a);
-  const max=Math.max(...a);
-  const range=max-min||1;
-
-  x.beginPath();
-
-  values.forEach((v,i)=>{
-   if(!v)return;
-
-   const xx=i/Math.max(values.length-1,1)*w;
-   const yy=h-20-((v-min)/range)*(h-30);
-
-   if(i===0)x.moveTo(xx,yy);
-   else x.lineTo(xx,yy);
-  });
-
-  x.strokeStyle=color;
-  x.lineWidth=2;
-  x.stroke();
- }
-
- ol(pv,"#111");
- ol(ev,"#d00000");
-
- x.fillStyle="#777";
+function chart(){
+ const {x,w,h}=size(cv);x.clearRect(0,0,w,h);
+ const ds=daySlots(),n=ds.length;
+ const showP=mode!=="emissions",showE=mode!=="price";
+ const l=showP?54:12,r=showE?40:12,t=14,b=28,pw=w-l-r,ph=h-t-b;
+ x.strokeStyle="#e5e5ea";x.lineWidth=1;
+ for(let i=0;i<=4;i++){const y=t+i/4*ph;x.beginPath();x.moveTo(l,y);x.lineTo(l+pw,y);x.stroke()}
+ const pv=ds.map(i=>pm.get(slots[i])),ev=ds.map(i=>em.get(slots[i]));
+ const rng=a=>{const f=a.filter(v=>v!==undefined);return f.length?[Math.min(...f),Math.max(...f)]:[0,1]};
+ const [pmin,pmax]=rng(pv),[emin,emax]=rng(ev);
  x.font="10px system-ui";
- x.fillText(days[0],0,h-4);
- x.textAlign="right";
- x.fillText(days[days.length-1],w,h-4);
- x.textAlign="left";
+ if(showP){
+  lineOf(x,pv,"#111",l,t,pw,ph,pmin,pmax);
+  x.fillStyle="#111";x.textAlign="left";
+  for(let i=0;i<=4;i++)x.fillText(money(pmax-(pmax-pmin)*i/4),2,t+i/4*ph+3);
+ }
+ if(showE){
+  lineOf(x,ev,"#d00000",l,t,pw,ph,emin,emax);
+  x.fillStyle="#d00000";x.textAlign="left";
+  for(let i=0;i<=4;i++)x.fillText(Math.round(emax-(emax-emin)*i/4),w-r+5,t+i/4*ph+3);
+ }
+ x.fillStyle="#777";x.textAlign="center";
+ for(let i=0;i<n;i+=4)x.fillText(hm(slots[ds[i]]),l+i/Math.max(n-1,1)*pw,h-10);
+ // marker for selected time
+ const si=ds.indexOf(idx);
+ if(si>=0){
+  const px=l+si/Math.max(n-1,1)*pw;
+  x.strokeStyle="#5b3fd0";x.lineWidth=2;x.beginPath();x.moveTo(px,t);x.lineTo(px,t+ph);x.stroke();
+  const dot=(v,min,max,c)=>{if(v===undefined)return;const py=t+ph-(v-min)/((max-min)||1)*ph;x.beginPath();x.arc(px,py,5,0,7);x.fillStyle="#fff";x.fill();x.strokeStyle=c;x.lineWidth=2.5;x.stroke()};
+  if(showP)dot(pv[si],pmin,pmax,"#111");
+  if(showE)dot(ev[si],emin,emax,"#d00000");
+ }
 }
 
 function render(){
- buttons();
- updateCards();
- draw();
- overviewDraw();
+ ["bp","be","bb"].forEach((id,i)=>$(id).classList.toggle("on",["price","emissions","both"][i]===mode));
+ cards();chart();
+}
+const go=n=>{const i=idx+n;if(i>=0&&i<slots.length){idx=i;render()}};
+function goDay(dir){
+ const k=key(slots[idx]);
+ const cand=dir<0?slots.filter(s=>key(s)<k):slots.filter(s=>key(s)>k);
+ if(!cand.length)return;
+ const targetKey=dir<0?key(cand[cand.length-1]):key(cand[0]);
+ const inDay=slots.map((s,i)=>i).filter(i=>key(slots[i])===targetKey);
+ // keep the same time of day if possible
+ const want=new Date(slots[idx]);const wm=want.getHours()*60+want.getMinutes();
+ let best=inDay[0],bd=1e9;
+ inDay.forEach(i=>{const d=new Date(slots[i]);const diff=Math.abs(d.getHours()*60+d.getMinutes()-wm);if(diff<bd){bd=diff;best=i}});
+ idx=best;render();
 }
 
-function info(){
- const d=dayData();
+$("prev").onclick=()=>go(-1);
+$("next").onclick=()=>go(1);
+$("prevDay").onclick=()=>goDay(-1);
+$("nextDay").onclick=()=>goDay(1);
+$("now").onclick=()=>{idx=slots.length-1;render()};
+$("bp").onclick=()=>{mode="price";render()};
+$("be").onclick=()=>{mode="emissions";render()};
+$("bb").onclick=()=>{mode="both";render()};
+document.addEventListener("keydown",e=>{if(e.key==="ArrowLeft")go(-1);if(e.key==="ArrowRight")go(1)});
 
- if(!d.times.length)return;
-
- if(selectedIndex<0)
-  selectedIndex=Math.floor(d.times.length/2);
-
- const t=d.times[selectedIndex];
- const p=d.pm.get(t);
- const e=d.em.get(t);
-
- let s="<strong>"+time(t)+"</strong>";
-
- if(p!==undefined)
-  s+=" &nbsp; <b>Price: "+money(p)+"</b>";
-
- if(e!==undefined)
-  s+=' &nbsp; <b style="color:#d00000">Emissions: '+
-   carbon(e)+"</b>";
-
- document.getElementById("info").innerHTML=s;
+function pick(e){
+ const ds=daySlots(),rect=cv.getBoundingClientRect();
+ const showP=mode!=="emissions",showE=mode!=="price";
+ const l=showP?54:12,r=showE?40:12,pw=rect.width-l-r;
+ const ratio=Math.max(0,Math.min(1,(e.clientX-rect.left-l)/pw));
+ idx=ds[Math.round(ratio*(ds.length-1))];render();
 }
-
-function changeDay(n){
- const d=new Date(selectedDate);
- d.setDate(d.getDate()+n);
-
- const today=new Date();
- today.setHours(0,0,0,0);
-
- if(d>today)return;
-
- const k=key(d);
-
- const available=new Set([
-  ...prices.map(v=>key(v.display_period.start)),
-  ...emissions.map(v=>key(v.display_period.start))
- ]);
-
- if(available.has(k)){
-  selectedDate=d;
-  selectedIndex=-1;
-  render();
-  info();
- }
-}
-
-document.getElementById("bp").onclick=()=>{
- mode="price";
- render();
-};
-
-document.getElementById("be").onclick=()=>{
- mode="emissions";
- render();
-};
-
-document.getElementById("bb").onclick=()=>{
- mode="both";
- render();
-};
-
-document.getElementById("prev").onclick=()=>{
- changeDay(-1);
-};
-
-document.getElementById("next").onclick=()=>{
- changeDay(1);
-};
-
-chart.onclick=e=>{
- const d=dayData();
-
- if(!d.times.length)return;
-
- const rect=chart.getBoundingClientRect();
- const l=52;
- const r=mode==="both"?58:18;
- const pw=rect.width-l-r;
-
- const ratio=Math.max(
-  0,
-  Math.min(
-   1,
-   (e.clientX-rect.left-l)/pw
-  )
- );
-
- selectedIndex=Math.round(
-  ratio*(d.times.length-1)
- );
-
- draw();
- info();
-};
+let drag=false;
+cv.addEventListener("pointerdown",e=>{drag=true;pick(e)});
+cv.addEventListener("pointermove",e=>{if(drag)pick(e)});
+addEventListener("pointerup",()=>drag=false);
+cv.style.touchAction="pan-y";
 
 async function load(){
  try{
-  const [pr,er]=await Promise.all([
-   fetch(P),
-   fetch(E)
-  ]);
-
-  prices=await pr.json();
-  emissions=await er.json();
-
-  const dates=[
-   ...prices.map(v=>new Date(v.display_period.start)),
-   ...emissions.map(v=>new Date(v.display_period.start))
-  ];
-
-  selectedDate=new Date();
-  selectedDate.setHours(0,0,0,0);
-
-  document.getElementById("loading")?.remove();
-
+  const [pr,er]=await Promise.all([fetch("history.json"),fetch("emissions_history.json")]);
+  prices=await pr.json();emissions=await er.json();
+  const now=new Date(),set=new Set();
+  prices.forEach(v=>{const s=v.display_period.start;pm.set(s,+v.price);ends.set(s,v.display_period.end);if(new Date(s)<=now)set.add(s)});
+  emissions.forEach(v=>{const s=v.display_period.start;em.set(s,+v.emissions);if(!ends.has(s))ends.set(s,v.display_period.end);if(new Date(s)<=now)set.add(s)});
+  slots=[...set].sort((a,b)=>new Date(a)-new Date(b));
+  if(!slots.length)throw new Error("no data");
+  // start on the slot that contains "now"
+  idx=slots.length-1;
   render();
-  info();
-
  }catch(err){
-  document.body.innerHTML=
-   "<p style='padding:20px'>Unable to load electricity data.</p>";
+  document.querySelector("main").innerHTML="<p style='padding:20px'>Unable to load electricity data.</p>";
   console.error(err);
  }
 }
-
-window.onresize=render;
+addEventListener("resize",()=>slots.length&&render());
 load();
 </script>
 </main>
