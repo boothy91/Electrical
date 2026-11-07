@@ -178,6 +178,11 @@ const GEN=new Map();
 const GCOL={solar:"#ffc928",wind:"#4fc3f7",hydro:"#2a7de1",gas:"#9a9a9a",coal:"#444",biomass:"#6bbf59",nuclear:"#b44fe0",pumpedstorage:"#1fb5ad",oil:"#8d5a3b",imports:"#e8793a",other:"#bbb"};
 const prettify=k=>k.replace(/([a-z])([A-Z])/g,"$1 $2").replace(/_/g," ").replace(/^./,c=>c.toUpperCase());
 function genList(v){
+ if(Array.isArray(v)){
+  const o={};
+  v.forEach(it=>{const k=it.fuel||it.fuelType||it.name||it.type||it.source;const n=it.value??it.mw??it.generation??it.output;if(k!==undefined)o[k]=n});
+  v=o;
+ }
  const out=[];
  for(const k in v){
   if(/^total/i.test(k))continue;
@@ -192,9 +197,17 @@ function genList(v){
 }
 function genPanel(){
  const v=GEN.get(slots[idx]);
- $("genBox").hidden=!v;
- if(!v)return;
- $("genRows").innerHTML=genList(v).map(o=>{
+ $("genBox").hidden=false;
+ const msg=t=>{$("genRows").innerHTML=`<div style="font-size:13px;color:#666">${t}</div>`};
+ if(!GEN.size)return msg("No generation data loaded. Check that <b>generation_history.json</b> is in the same folder as this page (run <code>python collect.py --refresh</code> and upload it).");
+ if(!v)return msg("No generation data for this time.");
+ let list=genList(v);
+ if(!list.length){
+  const sub=Object.values(v).find(x=>x&&typeof x==="object"&&!Array.isArray(x));
+  if(sub)list=genList(sub);
+ }
+ if(!list.length)return msg("Couldn't read the generation data. Fields found: "+JSON.stringify(v).slice(0,300));
+ $("genRows").innerHTML=list.map(o=>{
   const c=GCOL[o.k.toLowerCase().replace(/[^a-z]/g,"")]||(/import|export/i.test(o.k)?GCOL.imports:GCOL.other);
   return `<div class="row"><b>${o.name}</b><div class="track"><div class="fill" style="width:${Math.min(Math.abs(o.pct),100)}%;background:${c}"></div></div><div class="num">${o.gw.toFixed(2)} GW · ${o.pct.toFixed(1)}%</div></div>`;
  }).join("");
