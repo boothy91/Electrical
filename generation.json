@@ -1,24 +1,24 @@
 {
   "generation": {
-    "Biomass": 3245,
-    "Gas": 18042,
+    "Biomass": 3211,
+    "Gas": 20473,
     "Coal": 0,
-    "Imports & Exports": -2362,
-    "Hydro": 259,
-    "Nuclear": 5124,
+    "Imports & Exports": 3044,
+    "Hydro": 275,
+    "Nuclear": 5129,
     "Oil": 0,
-    "Pumped Storage": -926,
-    "Wind": 483
+    "Pumped Storage": -14,
+    "Wind": 628
   },
   "unit": "MW",
   "display_period": {
-    "start": "2026-11-08T05:00:00+00:00",
-    "end": "2026-11-08T05:30:00+00:00"
+    "start": "2026-11-08T12:30:00+00:00",
+    "end": "2026-11-08T13:00:00+00:00"
   },
   "api_period": {
-    "start": "2026-11-08T05:00:00+00:00",
-    "end": "2026-11-08T05:30:00+00:00"
+    "start": "2026-11-08T12:30:00+00:00",
+    "end": "2026-11-08T13:00:00+00:00"
   },
-  "collected_at": "2026-11-08T05:52:00.628780+00:00",
+  "collected_at": "2026-11-08T13:14:20.233756+00:00",
   "source": "Elexon BMRS (FUELHH)"
 }
